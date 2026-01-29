@@ -1,0 +1,421 @@
+.heroSection {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='%23e63946' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 10 10, auto;
+}
+
+/* Background Container */
+.backgroundContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  z-index: 1;
+}
+
+.backgroundImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.darkOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 26, 0.7) 0%,
+    rgba(10, 10, 26, 0.5) 50%,
+    rgba(10, 10, 26, 0.8) 100%
+  );
+}
+
+.vignetteOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+.grainTexture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Comic Halftone Background */
+.comicBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-image: 
+    radial-gradient(circle, #e63946 1px, transparent 1px),
+    radial-gradient(circle, #457b9d 1px, transparent 1px);
+  background-size: 20px 20px, 30px 30px;
+  background-position: 0 0, 10px 10px;
+  pointer-events: none;
+}
+
+/* Particles Container */
+.particlesContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambientParticle {
+  position: absolute;
+  pointer-events: none;
+}
+
+.particleHeart {
+  width: 12px;
+  height: 12px;
+  background: #e63946;
+  transform: rotate(-45deg);
+}
+
+.particleHeart::before,
+.particleHeart::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #e63946;
+  border-radius: 50%;
+}
+
+.particleHeart::before {
+  top: -6px;
+  left: 0;
+}
+
+.particleHeart::after {
+  top: 0;
+  left: 6px;
+}
+
+.particleDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.particleStar {
+  width: 8px;
+  height: 8px;
+  background: #ffd700;
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+
+/* Content Wrapper */
+.contentWrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 15vh;
+}
+
+/* Hanging Images Container */
+.hangingImagesContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70vh;
+  z-index: 15;
+}
+
+.hangingImageContainer {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: top center;
+}
+
+/* Web String */
+.webStringContainer {
+  position: relative;
+  width: 30px;
+  height: 150px;
+  transform-origin: top center;
+}
+
+.webString {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top;
+  filter: brightness(0.9);
+  transition: filter 0.3s ease;
+}
+
+.webVibration {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Image Frame */
+.imageFrame {
+  position: relative;
+  width: 180px;
+  height: 220px;
+  border: 6px solid #0a0a1a;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 
+    8px 8px 0 rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(230, 57, 70, 0.3);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.imageFrame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hangingImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(230, 57, 70, 0.1) 0%,
+    transparent 50%,
+    rgba(69, 123, 157, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+/* Hero Text Container */
+.heroTextContainer {
+  position: relative;
+  text-align: center;
+  z-index: 20;
+  padding: 0 2rem;
+}
+
+.bgText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(8rem, 20vw, 20rem);
+  font-weight: 900;
+  color: #e63946;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.1);
+}
+
+.heroTitle {
+  font-family: 'Bangers', 'Impact', 'Arial Black', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 
+    4px 4px 0 #e63946,
+    8px 8px 0 rgba(0, 0, 0, 0.3);
+  margin-bottom: 1rem;
+  line-height: 1.1;
+}
+
+.heroSubtitle {
+  font-family: 'Dancing Script', 'Brush Script MT', cursive;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  color: #ffb4b4;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-style: italic;
+}
+
+/* Comic Stickers */
+.comicSticker {
+  position: absolute;
+  padding: 0.8rem 1.5rem;
+  border: 4px solid #0a0a1a;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+  z-index: 25;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.comicSticker span {
+  font-family: 'Bangers', 'Impact', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 900;
+  color: #0a0a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Floating Icons */
+.floatingIcon {
+  position: absolute;
+  z-index: 20;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+  pointer-events: none;
+}
+
+/* Scroll Indicator */
+.scrollIndicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 30;
+}
+
+.scrollIndicator span {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.scrollArrow {
+  color: #e63946;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .imageFrame {
+    width: 120px;
+    height: 150px;
+    border-width: 4px;
+  }
+
+  .webStringContainer {
+    height: 100px;
+  }
+
+  .hangingImagesContainer {
+    height: 50vh;
+  }
+
+  .contentWrapper {
+    padding-bottom: 10vh;
+  }
+
+  .comicSticker {
+    padding: 0.5rem 1rem;
+    border-width: 3px;
+  }
+
+  .floatingIcon {
+    transform: scale(0.8);
+  }
+
+  .bgText {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .imageFrame {
+    width: 90px;
+    height: 110px;
+  }
+
+  .webStringContainer {
+    height: 70px;
+    width: 20px;
+  }
+
+  .heroTitle {
+    font-size: 1.8rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.2rem;
+  }
+}

@@ -1,0 +1,193 @@
+.scene {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  overflow: hidden;
+}
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #2d1b4e 0%, #1a0f2e 50%, #0d0618 100%);
+  z-index: 0;
+}
+
+.particleOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(230, 57, 70, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(255, 180, 180, 0.05) 0%, transparent 60%);
+  z-index: 1;
+}
+
+.webCorner1,
+.webCorner2 {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  z-index: 2;
+}
+
+.webCorner1 {
+  top: 0;
+  left: 0;
+}
+
+.webCorner2 {
+  top: 0;
+  right: 0;
+}
+
+.sectionTitle {
+  position: relative;
+  font-family: 'Georgia', serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  color: #fff;
+  text-align: center;
+  margin-bottom: 3rem;
+  z-index: 10;
+  text-shadow: 0 0 30px rgba(230, 57, 70, 0.5);
+  letter-spacing: 0.05em;
+}
+
+.heartContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.heartGlow {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(230, 57, 70, 0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.heartWrapper {
+  position: relative;
+  width: 250px;
+  height: 230px;
+  z-index: 1;
+}
+
+.heartSvg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 20px rgba(230, 57, 70, 0.5));
+}
+
+.percentageText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.percentNumber {
+  font-family: 'Georgia', serif;
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 30px rgba(230, 57, 70, 0.6);
+}
+
+.pulseRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 180px;
+  border: 2px solid rgba(230, 57, 70, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.message {
+  position: relative;
+  font-family: 'Georgia', serif;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  margin-top: 3rem;
+  z-index: 10;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.highlight {
+  color: #ff6b6b;
+  font-style: italic;
+  font-weight: bold;
+  text-shadow: 0 0 20px rgba(230, 57, 70, 0.6);
+}
+
+.floatingHeart {
+  position: absolute;
+  font-size: 1.5rem;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .scene {
+    padding: 3rem 1.5rem;
+  }
+
+  .heartWrapper {
+    width: 200px;
+    height: 180px;
+  }
+
+  .heartGlow {
+    width: 280px;
+    height: 280px;
+  }
+
+  .percentNumber {
+    font-size: 2.5rem;
+  }
+
+  .pulseRing {
+    width: 160px;
+    height: 145px;
+  }
+
+  .webCorner1,
+  .webCorner2 {
+    width: 100px;
+    height: 100px;
+  }
+
+  .floatingHeart {
+    font-size: 1.2rem;
+  }
+}

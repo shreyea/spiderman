@@ -1,0 +1,307 @@
+.scene {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  padding: 4rem 2rem;
+  overflow: hidden;
+}
+
+.comicBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #fff5f5 0%, #fff0f5 50%, #f5f0ff 100%);
+  z-index: 0;
+}
+
+.halftoneOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.08;
+  background-image: radial-gradient(circle, #e63946 1px, transparent 1px);
+  background-size: 8px 8px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.titleContainer {
+  position: relative;
+  text-align: center;
+  margin-bottom: 3rem;
+  z-index: 10;
+}
+
+.sectionTitle {
+  display: inline-block;
+  margin: 0;
+}
+
+.titleBubble {
+  display: inline-block;
+  font-family: 'Comic Sans MS', 'Bangers', cursive;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: #2d1b4e;
+  background: #fff;
+  padding: 0.8rem 2rem;
+  border-radius: 30px;
+  border: 4px solid #2d1b4e;
+  box-shadow: 
+    6px 6px 0 #e63946,
+    inset 0 -4px 0 rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.titleUnderline {
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, #e63946, #ff69b4, #e63946);
+  margin: 1rem auto 0;
+  border-radius: 2px;
+}
+
+.panelsContainer {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.comicPanel {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  border: 4px solid #2d1b4e;
+  box-shadow: 
+    8px 8px 0 rgba(45, 27, 78, 0.2),
+    inset 0 0 30px rgba(255, 180, 180, 0.1);
+  cursor: pointer;
+  overflow: visible;
+  transition: box-shadow 0.3s ease;
+}
+
+.comicPanel:hover {
+  box-shadow: 
+    12px 12px 0 rgba(230, 57, 70, 0.3),
+    inset 0 0 30px rgba(255, 180, 180, 0.2);
+}
+
+.effectBurst {
+  position: absolute;
+  top: -20px;
+  right: -15px;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.effectBurst::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--burst-color, #e63946);
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 
+    50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+  );
+  animation: burstPulse 2s ease-in-out infinite;
+}
+
+@keyframes burstPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.05) rotate(5deg); }
+}
+
+.effectText {
+  position: relative;
+  z-index: 2;
+  font-family: 'Comic Sans MS', 'Bangers', cursive;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.05em;
+}
+
+.panelContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.heartIcon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(230, 57, 70, 0.3));
+}
+
+.reasonTitle {
+  font-family: 'Comic Sans MS', 'Bangers', cursive;
+  font-size: 1.4rem;
+  color: #2d1b4e;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.speechBubble {
+  position: relative;
+  background: linear-gradient(180deg, #fff5f8 0%, #fff 100%);
+  border: 3px solid #2d1b4e;
+  border-radius: 20px;
+  padding: 1rem 1.5rem;
+  margin-top: 0.5rem;
+  box-shadow: 3px 3px 0 rgba(45, 27, 78, 0.15);
+}
+
+.bubbleTail {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid #2d1b4e;
+}
+
+.bubbleTail::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: -9px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 9px solid #fff5f8;
+}
+
+.reasonDescription {
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  color: #4a4a4a;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+.panelBorder {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border: 2px dashed rgba(230, 57, 70, 0.2);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.actionLines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(230, 57, 70, 0.15);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.panelSparkle1,
+.panelSparkle2 {
+  position: absolute;
+  font-size: 1rem;
+  z-index: 5;
+}
+
+.panelSparkle1 {
+  top: 10px;
+  left: 15px;
+}
+
+.panelSparkle2 {
+  bottom: 10px;
+  right: 15px;
+}
+
+/* Floating elements */
+.floatingPow,
+.floatingZap,
+.floatingStar {
+  position: absolute;
+  font-size: 2rem;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.floatingPow {
+  top: 15%;
+  left: 8%;
+}
+
+.floatingZap {
+  top: 25%;
+  right: 10%;
+}
+
+.floatingStar {
+  bottom: 20%;
+  left: 15%;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .scene {
+    padding: 3rem 1rem;
+  }
+
+  .panelsContainer {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    max-width: 400px;
+  }
+
+  .comicPanel {
+    padding: 1.5rem;
+  }
+
+  .effectBurst {
+    width: 60px;
+    height: 60px;
+    top: -15px;
+    right: -10px;
+  }
+
+  .effectText {
+    font-size: 0.75rem;
+  }
+
+  .titleBubble {
+    padding: 0.6rem 1.5rem;
+    border-width: 3px;
+    box-shadow: 4px 4px 0 #e63946;
+  }
+
+  .floatingPow,
+  .floatingZap,
+  .floatingStar {
+    font-size: 1.5rem;
+  }
+}
