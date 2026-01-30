@@ -1,19 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Bangers&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Bangers&family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  /* Color Palette */
+  /* Color Palette: Deep Blues, Warm Reds, Muted Purples, Pink & Gold Highlights */
   --color-primary: #e63946;
-  --color-secondary: #457b9d;
-  --color-pink: #ffb4b4;
-  --color-cream: #fef5e7;
-  --color-purple: #2d1b4e;
+  --color-primary-dark: #c1121f;
+  --color-primary-light: #ff6b6b;
+  --color-primary-glow: rgba(230, 57, 70, 0.5);
+  
+  /* Deep Blues */
+  --color-blue-deep: #1a2744;
+  --color-blue-medium: #2d4263;
+  --color-blue-light: #4a6fa5;
+  
+  /* Muted Purples */
+  --color-purple-deep: #2d2448;
+  --color-purple-medium: #4a3f6b;
+  --color-purple-light: #7c6c9f;
+  
+  /* Warm Accents */
   --color-gold: #ffd700;
-  --color-midnight: #0a0a1a;
+  --color-gold-soft: #e6c200;
+  --color-pink: #ff8fab;
+  --color-pink-soft: #ffb3c6;
+  --color-cream: #fff5e6;
+  --color-white: #ffffff;
+  
+  /* Background Gradients (No Pure Black) */
+  --bg-hero: linear-gradient(180deg, #0f1629 0%, #1a2744 40%, #2d2448 70%, #1a2744 100%);
+  --bg-section-warm: linear-gradient(180deg, #1e1a2e 0%, #2d2535 50%, #1e1a2e 100%);
+  --bg-section-cool: linear-gradient(180deg, #152238 0%, #1a2744 50%, #152238 100%);
+  --bg-night: linear-gradient(180deg, #0d1420 0%, #1a2744 30%, #2d2448 70%, #1a2744 100%);
+  --bg-scrapbook: linear-gradient(135deg, #1e1a2e 0%, #2a2540 50%, #1e1a2e 100%);
+  
+  /* Surface Colors */
+  --surface-dark: #0f1629;
+  --surface-medium: #1a2744;
+  --surface-light: #2d4263;
+  --surface-card: rgba(45, 66, 99, 0.5);
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #c4d4e8;
+  --text-muted: #8a9bb8;
+  --text-gold: #ffd700;
   
   /* Typography */
   --font-display: 'Playfair Display', Georgia, serif;
-  --font-handwritten: 'Dancing Script', 'Brush Script MT', cursive;
-  --font-body: Georgia, 'Times New Roman', serif;
+  --font-comic: 'Bangers', 'Impact', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -22,17 +56,28 @@
   --spacing-lg: 4rem;
   --spacing-xl: 6rem;
   
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
+  /* Border Radius - Rounded Panels */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-full: 50%;
   
-  /* Shadows */
-  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.15);
-  --shadow-glow-red: 0 0 30px rgba(230, 57, 70, 0.4);
-  --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.4);
+  /* Shadows - Strong Depth */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 8px 40px rgba(0, 0, 0, 0.4);
+  --shadow-heavy: 0 15px 60px rgba(0, 0, 0, 0.6);
+  --shadow-glow-red: 0 0 40px rgba(230, 57, 70, 0.4);
+  --shadow-glow-gold: 0 0 30px rgba(255, 215, 0, 0.3);
+  --shadow-glow-pink: 0 0 30px rgba(255, 143, 171, 0.3);
+  --shadow-glow-blue: 0 0 30px rgba(74, 111, 165, 0.3);
+  
+  /* Comic Styling - Thick Borders */
+  --comic-border: 4px solid rgba(255, 255, 255, 0.8);
+  --comic-border-medium: 3px solid rgba(255, 255, 255, 0.6);
+  --comic-border-light: 2px solid rgba(255, 255, 255, 0.3);
+  --comic-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
+  --comic-shadow-light: 4px 4px 0 rgba(0, 0, 0, 0.3);
 }
 
 *,
@@ -45,56 +90,46 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
   -webkit-overflow-scrolling: touch;
 }
 
 body {
   font-family: var(--font-body);
-  background: var(--color-midnight);
-  color: #fff;
+  background: var(--surface-dark);
+  color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth Scrolling Container */
-main {
-  scroll-snap-type: y proximity;
-}
-
-section {
-  scroll-snap-align: start;
-}
-
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-purple);
+  background: var(--surface-dark);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-primary);
-  border-radius: 4px;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-purple-medium));
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ff6b6b;
+  background: linear-gradient(180deg, var(--color-primary-light), var(--color-purple-light));
 }
 
 /* Selection */
 ::selection {
-  background: var(--color-pink);
-  color: var(--color-purple);
+  background: var(--color-primary);
+  color: var(--color-white);
 }
 
 /* Focus Styles */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 3px solid var(--color-gold);
   outline-offset: 2px;
 }
 
@@ -132,305 +167,193 @@ img {
   border: 0;
 }
 
-.text-center {
-  text-align: center;
-}
-
-/* Animation Classes */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes twinkle {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}
-
-@keyframes heartbeat {
-  0%, 100% {
-    transform: scale(1);
-  }
-  14% {
-    transform: scale(1.1);
-  }
-  28% {
-    transform: scale(1);
-  }
-  42% {
-    transform: scale(1.1);
-  }
-  70% {
-    transform: scale(1);
-  }
-}
-
-/* Paper Texture Mixin */
-.paper-texture {
-  position: relative;
-}
-
-.paper-texture::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.3;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-/* Mobile Touch Improvements */
-@media (hover: none) and (pointer: coarse) {
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  button:active {
-    transform: scale(0.98);
-  }
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Print Styles */
-@media print {
-  body {
-    background: white;
-    color: black;
-  }
-}
-
-/* ===============================================
-   COMIC BOOK STYLES - Spider Hero Theme
-   =============================================== */
-
 /* Comic Typography */
 .comic-title {
-  font-family: 'Bangers', 'Impact', 'Arial Black', sans-serif;
+  font-family: var(--font-comic);
+  letter-spacing: 2px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   text-shadow: 
-    3px 3px 0 var(--color-primary),
-    6px 6px 0 rgba(0, 0, 0, 0.3);
+    3px 3px 0 rgba(0, 0, 0, 0.5),
+    -1px -1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .comic-subtitle {
-  font-family: 'Dancing Script', 'Brush Script MT', cursive;
+  font-family: var(--font-display);
   font-style: italic;
+  letter-spacing: 1px;
 }
 
-/* Comic Panel Style */
+/* Halftone Pattern Overlay */
+.halftone-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 4px 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Grain Overlay */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Vignette Effect */
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(15, 22, 41, 0.6) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Comic Panel Frame */
 .comic-panel {
-  border: 4px solid #0a0a1a;
-  border-radius: 8px;
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
-  background: #fff;
-  overflow: hidden;
+  border: var(--comic-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--comic-shadow);
+  background: var(--surface-card);
+  backdrop-filter: blur(10px);
 }
 
-/* Comic Sticker Style */
-.comic-sticker {
-  display: inline-block;
+/* Sticker Base */
+.sticker {
+  font-family: var(--font-comic);
   padding: 0.5rem 1rem;
-  background: var(--color-gold);
-  border: 3px solid #0a0a1a;
-  border-radius: 8px;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
-  font-family: 'Bangers', 'Impact', sans-serif;
-  font-size: 1rem;
-  color: #0a0a1a;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  border-radius: var(--radius-md);
+  border: 3px solid currentColor;
+  box-shadow: var(--comic-shadow-light);
   transform: rotate(-5deg);
 }
 
-/* Halftone Pattern */
-.halftone-bg {
-  background-image: radial-gradient(circle, rgba(230, 57, 70, 0.1) 1px, transparent 1px);
-  background-size: 8px 8px;
+/* Speech Bubble */
+.speech-bubble {
+  position: relative;
+  background: var(--color-white);
+  color: var(--surface-dark);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 3px solid var(--surface-dark);
+  font-family: var(--font-comic);
 }
 
-/* Comic Action Lines */
-@keyframes comicPop {
-  0% {
-    transform: scale(0) rotate(-10deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2) rotate(5deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 30px;
+  border-width: 15px 10px 0;
+  border-style: solid;
+  border-color: var(--color-white) transparent transparent;
 }
 
-/* Web Swing Animation */
-@keyframes webSwing {
-  0%, 100% {
-    transform: rotate(-5deg) translateX(-5px);
-  }
-  50% {
-    transform: rotate(5deg) translateX(5px);
-  }
+/* Animation Keyframes */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
 }
 
-/* Web Vibration */
-@keyframes webVibrate {
-  0%, 100% {
-    transform: scaleX(1);
-  }
-  25% {
-    transform: scaleX(1.02);
-  }
-  75% {
-    transform: scaleX(0.98);
-  }
+@keyframes floatSway {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  25% { transform: translateY(-8px) rotate(1deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+  75% { transform: translateY(-6px) rotate(-1deg); }
 }
 
-/* Comic Sound Effect Pop */
-@keyframes soundPop {
-  0% {
-    transform: scale(0) rotate(-15deg);
-    opacity: 0;
-  }
-  40% {
-    transform: scale(1.3) rotate(10deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-/* Glow Pulse */
-@keyframes glowPulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(230, 57, 70, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(230, 57, 70, 0.7);
-  }
-}
-
-/* Wind Sway */
 @keyframes windSway {
-  0%, 100% {
-    transform: rotate(-3deg) translateX(-3px);
-  }
-  25% {
-    transform: rotate(0deg) translateX(0px);
-  }
-  50% {
-    transform: rotate(3deg) translateX(3px);
-  }
-  75% {
-    transform: rotate(0deg) translateX(0px);
-  }
+  0%, 100% { transform: rotate(-3deg) translateX(0); }
+  25% { transform: rotate(-1deg) translateX(5px); }
+  50% { transform: rotate(2deg) translateX(3px); }
+  75% { transform: rotate(0deg) translateX(-3px); }
 }
 
-/* Drop Animation */
-@keyframes dropIn {
-  0% {
-    transform: translateY(-100vh);
-    opacity: 0;
-  }
-  60% {
-    transform: translateY(20px);
-    opacity: 1;
-  }
-  80% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0);
-  }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
 }
 
-/* Bouncy Drop */
-@keyframes bouncyDrop {
-  0% {
-    transform: translateY(-100vh) scale(0.8);
-    opacity: 0;
-  }
-  50% {
-    transform: translateY(30px) scale(1.1);
-    opacity: 1;
-  }
-  70% {
-    transform: translateY(-15px) scale(0.95);
-  }
-  85% {
-    transform: translateY(8px) scale(1.02);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-  }
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(230, 57, 70, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(230, 57, 70, 0.6); }
 }
 
-/* Spider Color Scheme */
-:root {
-  --spider-red: #e63946;
-  --spider-blue: #457b9d;
-  --spider-yellow: #ffd700;
-  --spider-cream: #fef5e7;
-  --spider-black: #0a0a1a;
-  --comic-border: 4px solid #0a0a1a;
-  --comic-shadow: 6px 6px 0 rgba(0, 0, 0, 0.3);
+@keyframes sparkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes webStretch {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.05); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0) rotate(-10deg); }
+  70% { transform: scale(1.1) rotate(5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes drawLine {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Web Trail Effect */
+.web-trail {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  transform-origin: left center;
+}
+
+/* Parallax Layer Base */
+.parallax-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 22, 41, 0.9);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  :root {
+    --spacing-lg: 3rem;
+    --spacing-xl: 4rem;
+  }
 }
 

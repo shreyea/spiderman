@@ -1,93 +1,62 @@
 {
   "hero": {
-    "heading": "Every hero has a story…",
-    "subheading": "And mine began with you ❤️"
+    "heading": "Every hero has a story",
+    "subheading": "And mine is written in your name"
   },
-  "letter": {
-    "recipient": "My Dearest Love",
-    "content": "Even superheroes fall in love…\n\nAnd somehow, you became my favorite part of every day.\n\nI didn't plan it.\nI didn't expect it.\n\nBut I'm grateful it happened.\n\nYou make ordinary moments feel extraordinary, and every adventure better just by being there.\n\nWith you, I found my greatest power — love.",
-    "signature": "— Yours, Forever ❤️"
+  "skateScene": {
+    "message": "Every journey feels lighter with you."
+  },
+  "webMaze": {
+    "title": "Find Your Way to My Heart",
+    "winMessage": "No matter the path, I always reach you."
   },
   "memories": [
     {
       "id": 1,
-      "image": "/images/memory-1.jpg",
+      "image": "/images/Screenshot 2026-01-29 010408.png",
       "caption": "Our first adventure together",
       "rotation": -5
     },
     {
       "id": 2,
-      "image": "/images/memory-2.jpg",
-      "caption": "That sunset we'll never forget",
+      "image": "/images/Screenshot 2026-01-29 010445.png",
+      "caption": "That sunset we will never forget",
       "rotation": 3
     },
     {
       "id": 3,
-      "image": "/images/memory-3.jpg",
+      "image": "/images/Screenshot 2026-01-29 010613.png",
       "caption": "When you made me laugh so hard",
       "rotation": -2
     },
     {
       "id": 4,
-      "image": "/images/memory-4.jpg",
+      "image": "/images/Screenshot_2026-01-29_005819-removebg-preview.png",
       "caption": "Our favorite spot",
       "rotation": 4
     },
     {
       "id": 5,
-      "image": "/images/memory-5.jpg",
+      "image": "/images/Screenshot_2026-01-29_010110-removebg-preview.png",
       "caption": "The day everything changed",
       "rotation": -3
     },
     {
       "id": 6,
-      "image": "/images/memory-6.jpg",
+      "image": "/images/Screenshot_2026-01-29_010526-removebg-preview.png",
       "caption": "A moment frozen in time",
       "rotation": 2
     }
   ],
-  "reasons": [
-    {
-      "id": 1,
-      "title": "Your Smile",
-      "description": "It lights up my entire universe",
-      "effect": "POW!"
-    },
-    {
-      "id": 2,
-      "title": "Your Laugh",
-      "description": "The most beautiful sound I know",
-      "effect": "WOW!"
-    },
-    {
-      "id": 3,
-      "title": "Your Kindness",
-      "description": "You make the world better just by existing",
-      "effect": "LOVE!"
-    },
-    {
-      "id": 4,
-      "title": "Your Courage",
-      "description": "You inspire me to be braver",
-      "effect": "HERO!"
-    },
-    {
-      "id": 5,
-      "title": "Your Heart",
-      "description": "So big, so warm, so full of love",
-      "effect": "BOOM!"
-    },
-    {
-      "id": 6,
-      "title": "Everything",
-      "description": "Every little thing about you",
-      "effect": "∞"
-    }
-  ],
+  "loveMeter": {
+    "title": "Love Power Level",
+    "maxMessage": "Power level: UNSTOPPABLE"
+  },
   "finalMessage": {
-    "question": "Will you be my forever hero?",
-    "yesButton": "YES ❤️",
-    "alwaysButton": "ALWAYS 💍"
+    "question": "Will you be my forever adventure?",
+    "yesButton": "YES",
+    "alwaysButton": "ALWAYS",
+    "confession": "You are my greatest adventure."
   },
   "colors": {
     "primary": "#e63946",

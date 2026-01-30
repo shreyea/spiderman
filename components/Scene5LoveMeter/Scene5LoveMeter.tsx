@@ -1,243 +1,247 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useState, useRef, useCallback } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { Heart, Sparkles } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import styles from './Scene5LoveMeter.module.css';
 
 const Scene5LoveMeter: React.FC = () => {
-  const { ref, inView } = useInView({
-    threshold: 0.3,
-    triggerOnce: false,
+  const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [clickBonus, setClickBonus] = useState(0);
+  const [isShaking, setIsShaking] = useState(false);
+  const [clickBursts, setClickBursts] = useState<{ id: number; x: number; y: number }[]>([]);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start'],
   });
 
-  const [fillLevel, setFillLevel] = useState(0);
+  // Scroll fills 70% of the meter
+  const scrollFill = useTransform(scrollYProgress, [0.2, 0.8], [0, 70]);
 
-  useEffect(() => {
-    if (inView) {
-      const timer = setTimeout(() => {
-        setFillLevel(100);
-      }, 300);
-      return () => clearTimeout(timer);
-    } else {
-      setFillLevel(0);
+  // Total fill = scroll + click bonus (max 100)
+  const [displayedFill, setDisplayedFill] = useState(0);
+
+  // Update displayed fill based on scroll
+  React.useEffect(() => {
+    const unsubscribe = scrollFill.on('change', (value) => {
+      setDisplayedFill(Math.min(100, value + clickBonus));
+    });
+    return () => unsubscribe();
+  }, [scrollFill, clickBonus]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    if (displayedFill >= 100) {
+      // Trigger shake when already full
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 300);
+      return;
     }
-  }, [inView]);
+
+    // Add click bonus (each click adds 5%, up to 30% total)
+    setClickBonus((prev) => Math.min(30, prev + 5));
+
+    // Add burst effect
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const id = Date.now();
+    setClickBursts((prev) => [...prev, { id, x, y }]);
+
+    // Remove burst after animation
+    setTimeout(() => {
+      setClickBursts((prev) => prev.filter((b) => b.id !== id));
+    }, 500);
+  }, [displayedFill]);
+
+  const filledSegments = Math.floor(displayedFill / 10);
+  const isFull = displayedFill >= 100;
+
+  const stickerVariants = {
+    hidden: { scale: 0, rotate: -20 },
+    visible: (rotation: number) => ({
+      scale: 1,
+      rotate: rotation,
+      transition: {
+        type: 'spring',
+        stiffness: 200,
+        damping: 15,
+        delay: 0.8,
+      },
+    }),
+  };
 
   return (
-    <section className={styles.scene} ref={ref}>
-      {/* Background */}
-      <div className={styles.background}></div>
-      <div className={styles.particleOverlay}></div>
-
-      {/* Decorative elements */}
-      <div className={styles.webCorner1}>
-        <svg viewBox="0 0 100 100">
-          <path d="M0 0 Q50 50 0 100" stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="none" />
-          <path d="M0 0 Q30 50 0 100" stroke="rgba(255,255,255,0.15)" strokeWidth="1" fill="none" />
-          <path d="M0 0 Q70 50 0 100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" fill="none" />
+    <section
+      className={styles.meterSection}
+      ref={(node) => {
+        (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        ref(node);
+      }}
+    >
+      {/* Web Pattern Background */}
+      <div className={styles.webPattern}>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+          <circle cx="50" cy="50" r="45" className={styles.webPatternLine} />
+          <circle cx="50" cy="50" r="35" className={styles.webPatternLine} />
+          <circle cx="50" cy="50" r="25" className={styles.webPatternLine} />
+          <circle cx="50" cy="50" r="15" className={styles.webPatternLine} />
+          <line x1="50" y1="5" x2="50" y2="95" className={styles.webPatternLine} />
+          <line x1="5" y1="50" x2="95" y2="50" className={styles.webPatternLine} />
+          <line x1="15" y1="15" x2="85" y2="85" className={styles.webPatternLine} />
+          <line x1="85" y1="15" x2="15" y2="85" className={styles.webPatternLine} />
         </svg>
       </div>
-      <div className={styles.webCorner2}>
-        <svg viewBox="0 0 100 100">
-          <path d="M100 0 Q50 50 100 100" stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="none" />
-          <path d="M100 0 Q70 50 100 100" stroke="rgba(255,255,255,0.15)" strokeWidth="1" fill="none" />
-          <path d="M100 0 Q30 50 100 100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" fill="none" />
-        </svg>
-      </div>
+      <div className={styles.grainOverlay} />
 
-      {/* Title */}
-      <motion.h2 
-        className={styles.sectionTitle}
-        initial={{ opacity: 0, y: 30 }}
-        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-        transition={{ duration: 0.8 }}
-      >
-        Love Power Level
-      </motion.h2>
-
-      {/* Main Heart Container */}
-      <motion.div 
-        className={styles.heartContainer}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={inView ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      >
-        {/* Glowing backdrop */}
-        <motion.div 
-          className={styles.heartGlow}
-          animate={inView ? {
-            scale: [1, 1.1, 1],
-            opacity: [0.3, 0.6, 0.3],
-          } : {}}
-          transition={{ duration: 2, repeat: Infinity }}
+      {/* Web Decoration Lines */}
+      <div className={styles.webDecorations}>
+        <motion.div
+          className={`${styles.webLine} ${styles.webLine1}`}
+          initial={{ scaleY: 0 }}
+          animate={inView ? { scaleY: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
         />
+        <motion.div
+          className={`${styles.webLine} ${styles.webLine2}`}
+          initial={{ scaleY: 0 }}
+          animate={inView ? { scaleY: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        />
+        <motion.div
+          className={`${styles.webLine} ${styles.webLine3}`}
+          initial={{ scaleY: 0 }}
+          animate={inView ? { scaleY: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        />
+      </div>
 
-        {/* Heart SVG */}
-        <div className={styles.heartWrapper}>
-          <svg viewBox="0 0 200 180" className={styles.heartSvg}>
-            {/* Heart outline */}
-            <defs>
-              <clipPath id="heartClip">
-                <path d="M100 170 C40 120 0 80 0 50 C0 20 25 0 55 0 C75 0 90 15 100 30 C110 15 125 0 145 0 C175 0 200 20 200 50 C200 80 160 120 100 170 Z" />
-              </clipPath>
-              <linearGradient id="fillGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                <stop offset="0%" stopColor="#e63946" />
-                <stop offset="50%" stopColor="#ff6b6b" />
-                <stop offset="100%" stopColor="#ff8e8e" />
-              </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
+      {/* Content */}
+      <div className={styles.contentContainer}>
+        <motion.h2
+          className={styles.title}
+          initial={{ y: -30, opacity: 0 }}
+          animate={inView ? { y: 0, opacity: 1 } : {}}
+          transition={{ duration: 0.6 }}
+        >
+          Love Power Meter
+        </motion.h2>
 
-            {/* Background heart */}
-            <path 
-              d="M100 170 C40 120 0 80 0 50 C0 20 25 0 55 0 C75 0 90 15 100 30 C110 15 125 0 145 0 C175 0 200 20 200 50 C200 80 160 120 100 170 Z"
-              fill="rgba(255,255,255,0.1)"
-              stroke="rgba(255,255,255,0.3)"
-              strokeWidth="2"
-            />
-
-            {/* Fill animation */}
-            <g clipPath="url(#heartClip)">
-              <motion.rect
-                x="0"
-                y="180"
-                width="200"
-                height="180"
-                fill="url(#fillGradient)"
-                filter="url(#glow)"
-                initial={{ y: 180 }}
-                animate={{ y: 180 - (fillLevel * 1.8) }}
-                transition={{ duration: 2.5, ease: 'easeOut' }}
-              />
-              
-              {/* Wave effect */}
-              <motion.path
-                d="M-20 0 Q30 -10 80 0 T180 0 T280 0 V200 H-20 Z"
-                fill="rgba(255,255,255,0.2)"
-                initial={{ x: -100, y: 180 }}
-                animate={{ 
-                  x: [-100, 0, -100],
-                  y: 180 - (fillLevel * 1.8) - 5 
-                }}
-                transition={{ 
-                  x: { duration: 3, repeat: Infinity, ease: 'linear' },
-                  y: { duration: 2.5, ease: 'easeOut' }
-                }}
-              />
-            </g>
-
-            {/* Heart outline stroke */}
-            <path 
-              d="M100 170 C40 120 0 80 0 50 C0 20 25 0 55 0 C75 0 90 15 100 30 C110 15 125 0 145 0 C175 0 200 20 200 50 C200 80 160 120 100 170 Z"
-              fill="none"
-              stroke="#fff"
-              strokeWidth="3"
-              filter="url(#glow)"
-            />
-          </svg>
-
-          {/* Percentage text */}
-          <motion.div 
-            className={styles.percentageText}
-            animate={inView ? { scale: [1, 1.05, 1] } : {}}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <motion.span 
-              className={styles.percentNumber}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+        {/* Meter Container */}
+        <motion.div
+          className={`${styles.meterContainer} ${isShaking ? styles.shake : ''} ${isFull ? styles.fullGlow : ''}`}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={inView ? { scale: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          onClick={handleClick}
+        >
+          {/* Heart Icon */}
+          <div className={styles.heartIcon}>
+            <motion.div
+              animate={isFull ? { scale: [1, 1.2, 1] } : { scale: [1, 1.05, 1] }}
+              transition={{ duration: isFull ? 0.5 : 1.5, repeat: Infinity }}
             >
-              {fillLevel}%
-            </motion.span>
-          </motion.div>
-        </div>
+              <Heart
+                className={styles.heartIconInner}
+                size={64}
+                fill="currentColor"
+              />
+            </motion.div>
+            {isFull && (
+              <motion.div
+                className={styles.sparkleRing}
+                animate={{ opacity: [0, 1, 0], rotate: [0, 360] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            )}
+          </div>
 
-        {/* Pulsing rings */}
-        {inView && [0, 1, 2].map((i) => (
+          {/* Meter Track */}
+          <div className={styles.meterTrack}>
+            {Array.from({ length: 10 }, (_, i) => (
+              <motion.div
+                key={i}
+                className={styles.meterSegment}
+                initial={{ opacity: 0, x: -20 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                transition={{ delay: 0.3 + i * 0.05 }}
+              >
+                <div
+                  className={`${styles.segmentFill} ${i < filledSegments ? styles.filled : ''}`}
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Percentage */}
           <motion.div
-            key={i}
-            className={styles.pulseRing}
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{
-              scale: [0.8, 1.5, 2],
-              opacity: [0.5, 0.2, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: i * 0.6,
-              ease: 'easeOut',
-            }}
-          />
-        ))}
-      </motion.div>
+            className={styles.percentage}
+            key={Math.floor(displayedFill)}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            {Math.floor(displayedFill)}%
+          </motion.div>
 
-      {/* Message */}
-      <motion.p 
-        className={styles.message}
-        initial={{ opacity: 0, y: 20 }}
-        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.8, delay: 1 }}
+          {/* Power Level Text */}
+          <div className={styles.powerLevel}>
+            {isFull ? (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring' }}
+              >
+                UNSTOPPABLE
+              </motion.span>
+            ) : (
+              'Power Level'
+            )}
+          </div>
+
+          {/* Click Instruction */}
+          <div className={styles.clickInstruction}>
+            {isFull ? 'Maximum Power Achieved!' : 'Scroll & Click to Power Up'}
+          </div>
+
+          {/* Click Burst Effects */}
+          <AnimatePresence>
+            {clickBursts.map((burst) => (
+              <motion.div
+                key={burst.id}
+                className={styles.clickBurst}
+                style={{ left: burst.x, top: burst.y }}
+                initial={{ scale: 0, opacity: 1 }}
+                animate={{ scale: 2, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+
+      {/* Stickers */}
+      <motion.div
+        className={`${styles.sticker} ${styles.stickerPower}`}
+        variants={stickerVariants}
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        custom={10}
       >
-        My love for you is <span className={styles.highlight}>infinite</span> ❤️
-      </motion.p>
-
-      {/* Floating Hearts */}
-      {inView && [...Array(12)].map((_, i) => (
-        <motion.div
-          key={i}
-          className={styles.floatingHeart}
-          style={{
-            left: `${10 + Math.random() * 80}%`,
-            bottom: '10%',
-          }}
-          animate={{
-            y: [0, -400],
-            x: [0, Math.sin(i) * 40],
-            opacity: [0, 1, 0],
-            scale: [0.5, 1, 0.3],
-            rotate: [0, 360],
-          }}
-          transition={{
-            duration: 4 + Math.random() * 2,
-            repeat: Infinity,
-            delay: Math.random() * 3,
-            ease: 'easeOut',
-          }}
-        >
-          {['❤️', '💕', '💖', '💗', '💓'][Math.floor(Math.random() * 5)]}
-        </motion.div>
-      ))}
-
-      {/* Sparkles */}
-      {inView && [...Array(15)].map((_, i) => (
-        <motion.div
-          key={`sparkle-${i}`}
-          className={styles.sparkle}
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0.5, 1.2, 0.5],
-          }}
-          transition={{
-            duration: 2 + Math.random(),
-            repeat: Infinity,
-            delay: Math.random() * 2,
-          }}
-        >
-          ✨
-        </motion.div>
-      ))}
+        POWER
+      </motion.div>
+      <motion.div
+        className={`${styles.sticker} ${styles.stickerMax}`}
+        variants={stickerVariants}
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        custom={-8}
+      >
+        MAX
+      </motion.div>
     </section>
   );
 };
