@@ -274,6 +274,71 @@ const Scene1Arrival: React.FC = () => {
         <span>Scroll to continue</span>
         <motion.span className={styles.arrow}>↓</motion.span>
       </motion.div>
+
+      {/* Comic Stickers */}
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '15%',
+          left: '10%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(-15deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '-20deg' }}
+      >
+        <span>SWING!</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '25%',
+          right: '15%',
+          backgroundColor: '#ffd700',
+          transform: 'rotate(10deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2.5, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '15deg' }}
+      >
+        <span>HERO</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '30%',
+          left: '20%',
+          backgroundColor: '#457b9d',
+          transform: 'rotate(-8deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 3, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '-12deg' }}
+      >
+        <span>NIGHT</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '20%',
+          right: '10%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(12deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 3.5, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '17deg' }}
+      >
+        <span>WEB</span>
+      </motion.div>
     </motion.section>
   );
 };

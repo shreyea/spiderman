@@ -373,6 +373,71 @@ const Scene6Final: React.FC = () => {
           </>
         )}
       </AnimatePresence>
+
+      {/* Comic Stickers */}
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '10%',
+          left: '5%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(-12deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '-17deg' }}
+      >
+        <span>FOREVER</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '18%',
+          right: '8%',
+          backgroundColor: '#ffd700',
+          transform: 'rotate(10deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2.3, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '15deg' }}
+      >
+        <span>LOVE</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '25%',
+          left: '8%',
+          backgroundColor: '#457b9d',
+          transform: 'rotate(-8deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2.6, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '-13deg' }}
+      >
+        <span>HERO</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '15%',
+          right: '5%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(14deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2.9, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '19deg' }}
+      >
+        <span>ADVENTURE</span>
+      </motion.div>
     </section>
   );
 };

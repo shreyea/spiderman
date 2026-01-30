@@ -225,6 +225,75 @@ const Scene4Collage: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Comic Stickers */}
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '10%',
+          left: '5%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(-12deg)',
+        }}
+        variants={stickerVariants}
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        custom={-15}
+        whileHover={{ scale: 1.1, rotate: '-17deg' }}
+      >
+        <span>MEMORIES</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '20%',
+          right: '8%',
+          backgroundColor: '#ffd700',
+          transform: 'rotate(8deg)',
+        }}
+        variants={stickerVariants}
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        custom={12}
+        whileHover={{ scale: 1.1, rotate: '13deg' }}
+      >
+        <span>HEART</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '25%',
+          left: '10%',
+          backgroundColor: '#457b9d',
+          transform: 'rotate(-6deg)',
+        }}
+        variants={stickerVariants}
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        custom={-10}
+        whileHover={{ scale: 1.1, rotate: '-11deg' }}
+      >
+        <span>STICKY</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '15%',
+          right: '5%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(14deg)',
+        }}
+        variants={stickerVariants}
+        initial="hidden"
+        animate={inView ? 'visible' : 'hidden'}
+        custom={18}
+        whileHover={{ scale: 1.1, rotate: '19deg' }}
+      >
+        <span>LOVE</span>
+      </motion.div>
     </section>
   );
 };

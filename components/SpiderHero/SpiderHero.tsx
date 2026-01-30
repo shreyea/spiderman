@@ -262,7 +262,13 @@ const SpiderHero: React.FC = () => {
       setShowImages(true);
       setBgPushed(true);
     }, 2500);
-    return () => clearTimeout(timer);
+    const resetTimer = setTimeout(() => {
+      setBgPushed(false);
+    }, 4000); // Reset bg to full screen after 4 seconds
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(resetTimer);
+    };
   }, []);
 
   const hangingImages = [

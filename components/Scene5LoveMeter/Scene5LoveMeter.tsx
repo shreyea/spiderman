@@ -225,6 +225,70 @@ const Scene5LoveMeter: React.FC = () => {
 
       {/* Stickers */}
       <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '8%',
+          left: '5%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(-10deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '-15deg' }}
+      >
+        <span>POWER</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          top: '15%',
+          right: '8%',
+          backgroundColor: '#ffd700',
+          transform: 'rotate(12deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2.3, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '17deg' }}
+      >
+        <span>LOVE</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '25%',
+          left: '8%',
+          backgroundColor: '#457b9d',
+          transform: 'rotate(-8deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2.6, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '-13deg' }}
+      >
+        <span>ENERGY</span>
+      </motion.div>
+
+      <motion.div
+        className={styles.comicSticker}
+        style={{
+          bottom: '18%',
+          right: '5%',
+          backgroundColor: '#e63946',
+          transform: 'rotate(10deg)',
+        }}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={inView ? { scale: 1, opacity: 1 } : {}}
+        transition={{ delay: 2.9, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1, rotate: '15deg' }}
+      >
+        <span>MAXIMUM</span>
+      </motion.div>
+
+      <motion.div
         className={`${styles.sticker} ${styles.stickerPower}`}
         variants={stickerVariants}
         initial="hidden"

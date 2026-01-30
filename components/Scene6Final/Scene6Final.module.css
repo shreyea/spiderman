@@ -313,6 +313,27 @@
   transform: rotate(8deg);
 }
 
+/* Comic Stickers */
+.comicSticker {
+  position: absolute;
+  padding: 0.8rem 1.2rem;
+  border: 4px solid #0a0a1a;
+  border-radius: 12px;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+  z-index: 15;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.comicSticker span {
+  font-family: 'Bangers', 'Impact', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 900;
+  color: #0a0a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .webHeartContainer {
