@@ -8,7 +8,7 @@ import styles from './Scene5LoveMeter.module.css';
 
 const Scene5LoveMeter: React.FC = () => {
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true });
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
   const [clickBonus, setClickBonus] = useState(0);
   const [isShaking, setIsShaking] = useState(false);
   const [clickBursts, setClickBursts] = useState<{ id: number; x: number; y: number }[]>([]);
@@ -77,7 +77,7 @@ const Scene5LoveMeter: React.FC = () => {
     <section
       className={styles.meterSection}
       ref={(node) => {
-        (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        containerRef.current = node;
         ref(node);
       }}
     >
