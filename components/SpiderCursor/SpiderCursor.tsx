@@ -57,7 +57,7 @@ const SpiderCursor: React.FC = () => {
   // Handle mouse down
   const handleMouseDown = useCallback((e: MouseEvent) => {
     setIsClicking(true);
-    
+
     // Add click splash
     const splash: ClickSplash = {
       id: Date.now(),
@@ -80,7 +80,7 @@ const SpiderCursor: React.FC = () => {
   // Handle hover detection
   const handleMouseOver = useCallback((e: MouseEvent) => {
     const target = e.target as HTMLElement;
-    const isInteractive = 
+    const isInteractive =
       target.tagName === 'A' ||
       target.tagName === 'BUTTON' ||
       target.closest('a') ||
@@ -88,7 +88,7 @@ const SpiderCursor: React.FC = () => {
       target.getAttribute('role') === 'button' ||
       target.style.cursor === 'pointer' ||
       window.getComputedStyle(target).cursor === 'pointer';
-    
+
     setIsHovering(!!isInteractive);
   }, []);
 
@@ -126,10 +126,8 @@ const SpiderCursor: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (!isVisible) return null;
-
   return (
-    <div className={styles.cursorContainer}>
+    <div className={styles.cursorContainer} style={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.2s ease' }}>
       {/* Silk Trail */}
       <div className={styles.silkTrail}>
         {trail.map((point, index) => (
@@ -174,7 +172,7 @@ const SpiderCursor: React.FC = () => {
             <circle cx="12" cy="12" r="8" className={styles.webCursorPath} />
           </svg>
           {/* Center dot */}
-          <motion.div 
+          <motion.div
             className={styles.cursorDot}
             animate={{
               scale: isHovering ? 1.5 : 1,

@@ -1,0 +1,99 @@
+/* InlineEditor - Premium themed editing component */
+
+.editorWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  cursor: pointer;
+  padding: 2px 6px;
+  margin: -2px -6px;
+  border-radius: 6px;
+  border: 1px dashed transparent;
+  transition: all 0.2s ease;
+}
+
+/* Hover state - subtle hint to edit */
+.editorWrapper:hover:not(.isEditing) {
+  border-color: rgba(230, 57, 70, 0.4);
+  background: rgba(230, 57, 70, 0.05);
+}
+
+.editorWrapper.isEditing {
+  cursor: text;
+  border-color: transparent;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+/* Display text styling */
+.displayText {
+  color: inherit;
+  font: inherit;
+}
+
+/* Edit hint icon - appears on hover */
+.editHint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  color: #e63946;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.editorWrapper:hover .editHint {
+  opacity: 0.8;
+}
+
+/* Input styling - matches site theme */
+.editInput {
+  font: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #e63946;
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 200px;
+  width: 100%;
+  max-width: 400px;
+  outline: none;
+  box-shadow:
+    0 4px 12px rgba(230, 57, 70, 0.15),
+    0 0 0 4px rgba(230, 57, 70, 0.08);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.editInput:focus {
+  border-color: #e63946;
+  box-shadow:
+    0 4px 16px rgba(230, 57, 70, 0.2),
+    0 0 0 4px rgba(230, 57, 70, 0.12);
+}
+
+.editInput::placeholder {
+  color: rgba(0, 0, 0, 0.35);
+  font-style: italic;
+}
+
+/* Textarea specific */
+textarea.editInput {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Dark mode / dark background support */
+@media (prefers-color-scheme: dark) {
+  .editInput {
+    background: rgba(30, 30, 40, 0.95);
+    color: #fff;
+    border-color: #ff6b7a;
+  }
+
+  .editInput::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+}

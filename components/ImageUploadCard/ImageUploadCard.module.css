@@ -1,0 +1,99 @@
+/* ImageUploadCard - Clean upload UI */
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 140px;
+}
+
+.label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.previewContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #e9ecef;
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+}
+
+.previewContainer:hover {
+    border-color: #e63946;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(230, 57, 70, 0.15);
+}
+
+.preview {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #adb5bd;
+}
+
+.placeholder span {
+    font-size: 0.7rem;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(230, 57, 70, 0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.previewContainer:hover .overlay {
+    opacity: 1;
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.captionInput {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.captionInput:focus {
+    border-color: #e63946;
+    box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+}
+
+.captionInput::placeholder {
+    color: #adb5bd;
+}

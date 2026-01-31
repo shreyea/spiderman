@@ -6,7 +6,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-section-warm);
 }
 
 /* Background Image */
@@ -20,28 +19,37 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.4) saturate(1.2);
+  filter: brightness(0.55) saturate(1.3);
 }
 
-/* Dark Overlay */
+/* Overlays */
 .darkOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(30, 26, 46, 0.7) 0%,
-    rgba(45, 36, 72, 0.6) 50%,
-    rgba(30, 26, 46, 0.8) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(30, 26, 46, 0.5) 0%,
+      rgba(45, 36, 72, 0.4) 50%,
+      rgba(30, 26, 46, 0.55) 100%);
   z-index: 1;
+}
+
+.comicHalftone {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(230, 57, 70, 0.03) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 215, 0, 0.02) 1px, transparent 1px);
+  background-size: 5px 5px, 8px 8px;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .grainOverlay {
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
 }
 
 /* Content Container */
@@ -52,6 +60,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem;
+  gap: 1.25rem;
 }
 
 /* Title */
@@ -61,95 +70,109 @@
   color: var(--color-white);
   text-transform: uppercase;
   letter-spacing: 3px;
-  text-shadow: 
+  text-shadow:
     3px 3px 0 var(--color-primary),
-    6px 6px 0 rgba(0, 0, 0, 0.3);
-  margin-bottom: 2rem;
+    6px 6px 0 rgba(0, 0, 0, 0.5);
   text-align: center;
+  padding: 1rem 2rem;
+  background: rgba(26, 39, 68, 0.95);
+  border: 5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.5);
 }
 
-/* Maze Container */
-.mazeContainer {
-  position: relative;
-  width: min(500px, 90vw);
-  height: min(500px, 90vw);
-  border: 2px solid rgba(255, 255, 255, 0.06);
+/* Caught Counter */
+.caughtCounter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-comic);
+  font-size: 1.25rem;
+  color: var(--color-gold);
+  background: rgba(26, 39, 68, 0.95);
+  padding: 0.6rem 1.5rem;
+  border: 3px solid var(--color-gold);
+  border-radius: 25px;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Message Bubble */
+.messageBubble {
+  font-family: var(--font-comic);
+  font-size: 1.2rem;
+  color: var(--surface-dark);
+  background: var(--color-white);
+  padding: 1rem 2rem;
+  border: 4px solid var(--surface-dark);
   border-radius: 20px;
-  background: linear-gradient(180deg, rgba(10,12,25,0.55), rgba(25,30,55,0.45));
-  box-shadow: 0 10px 40px rgba(10, 10, 20, 0.6), inset 0 0 40px rgba(0,0,0,0.35);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+  z-index: 30;
+}
+
+/* Game Container - warm romantic colors */
+.gameContainer {
+  position: relative;
+  width: min(420px, 85vw);
+  height: min(420px, 85vw);
+  border: 7px solid rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(90, 50, 70, 0.7), rgba(65, 40, 60, 0.6));
+  box-shadow:
+    0 18px 55px rgba(230, 57, 70, 0.25),
+    inset 0 0 50px rgba(230, 57, 70, 0.1),
+    10px 10px 0 rgba(0, 0, 0, 0.5);
   overflow: hidden;
   cursor: none;
 }
 
-/* Maze SVG */
-.mazeSvg {
+/* Floating Hearts */
+.floatingHeart {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.mazePath {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: stroke 0.25s ease, stroke-width 0.25s ease;
-}
-
-.mazePrimary {
-  stroke-width: 6;
-  stroke-opacity: 0.95;
-  filter: drop-shadow(0 0 8px rgba(255, 220, 120, 0.12));
-}
-
-.mazeDetail {
-  stroke-width: 3;
-  stroke-opacity: 0.65;
-}
-
-.mazeAccent {
-  stroke-width: 4;
-  stroke-opacity: 0.5;
-  stroke-dasharray: 8 6;
-}
-
-/* Heart Player */
-.heartPlayer {
-  position: absolute;
-  pointer-events: none;
-  filter: drop-shadow(0 0 15px rgba(230, 57, 70, 0.6));
-  z-index: 20;
-  transition: transform 0.1s ease-out;
-}
-
-/* Center Goal */
-.centerGoal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
   transform: translate(-50%, -50%);
-  width: 60px;
-  height: 60px;
+  filter: drop-shadow(0 0 12px rgba(230, 57, 70, 0.7));
+  pointer-events: none;
+  z-index: 10;
+}
+
+.floatingHeart.caught {
+  pointer-events: none;
+}
+
+/* Web Cursor */
+.webCursor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.webCursorInner {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4), transparent 60%);
+  border: 3px solid rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.32), rgba(255, 200, 40, 0.08) 60%, transparent 85%);
-  border-radius: 50%;
-}
-
-.goalIcon {
   color: var(--color-gold);
-  animation: goalPulse 2s infinite ease-in-out;
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7));
 }
 
-@keyframes goalPulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.2); opacity: 1; }
+/* Sticker Burst */
+.stickerBurst {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(255, 215, 0, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 25;
 }
 
-/* Victory Overlay */
+/* Start / Victory Overlays - warm romantic colors */
+.startOverlay,
 .victoryOverlay {
   position: absolute;
   inset: 0;
@@ -157,112 +180,149 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 22, 41, 0.9);
+  background: rgba(80, 45, 60, 0.88);
   backdrop-filter: blur(5px);
-  z-index: 30;
+  z-index: 25;
+  border-radius: 17px;
 }
 
-.victoryBurst {
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(230, 57, 70, 0.3) 0%,
-    rgba(255, 215, 0, 0.2) 30%,
-    transparent 60%
-  );
-  animation: burstPulse 1.5s ease-out forwards;
-}
-
-@keyframes burstPulse {
-  0% { transform: scale(0); opacity: 0; }
-  50% { opacity: 1; }
-  100% { transform: scale(1); opacity: 0.5; }
-}
-
-.victoryText {
-  position: relative;
+.startButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 2.25rem;
   font-family: var(--font-comic);
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-size: 1.2rem;
+  color: white;
+  background: linear-gradient(135deg, var(--color-primary), #ff4757);
+  border: 5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 50px;
+  box-shadow:
+    0 10px 30px rgba(230, 57, 70, 0.6),
+    7px 7px 0 rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+}
+
+.startButton:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 14px 40px rgba(230, 57, 70, 0.7),
+    9px 9px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Victory Elements */
+.confettiHeart {
+  position: absolute;
+  bottom: 0;
+  color: var(--color-primary);
+}
+
+.flyingSticker {
+  position: absolute;
+  width: 50px;
+  height: auto;
+  filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.5));
+  z-index: 5;
+}
+
+.victoryContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  z-index: 10;
+}
+
+.victoryMessage {
+  font-family: var(--font-comic);
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
   color: var(--color-white);
   text-align: center;
-  padding: 1.5rem 2rem;
-  background: rgba(45, 66, 99, 0.8);
-  border: 4px solid rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
-  max-width: 80%;
-  line-height: 1.6;
+  padding: 1.25rem 1.75rem;
+  background: linear-gradient(135deg, rgba(180, 90, 110, 0.95), rgba(140, 60, 85, 0.95));
+  border: 5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.5);
+  max-width: 90%;
+  line-height: 1.5;
 }
 
-/* Instructions */
-.instructions {
-  font-family: var(--font-body);
+.playAgainButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-comic);
+  font-size: 1.1rem;
+  color: var(--surface-dark);
+  background: var(--color-gold);
+  border: 4px solid var(--surface-dark);
+  border-radius: 30px;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.playAgainButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Control Hint - warm colors */
+.controlHint {
+  font-family: var(--font-display);
   font-size: 0.9rem;
-  color: var(--text-secondary);
-  text-align: center;
-  margin-top: 1.5rem;
-  padding: 0.8rem 1.5rem;
-  background: rgba(45, 66, 99, 0.5);
-  border-radius: 12px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 1rem;
+  background: rgba(120, 60, 80, 0.7);
+  border-radius: 20px;
 }
 
-/* Web Glow Effect */
-.webGlow {
+/* Sticker Images */
+.stickerImage {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-  mix-blend-mode: screen;
+  width: 95px;
+  height: auto;
+  opacity: 0.95;
+  filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.5));
+  z-index: 12;
+  cursor: pointer;
 }
 
-/* Floating decorations */
-.floatingDecorations {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 3;
+.stickerImage:hover {
+  filter: drop-shadow(6px 6px 12px rgba(230, 57, 70, 0.6));
 }
 
-.floatingHeart {
-  position: absolute;
-  color: var(--color-pink-soft);
-  opacity: 0.3;
-  animation: floatHeart 4s infinite ease-in-out;
-}
-
-@keyframes floatHeart {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-15px) scale(1.1); }
-}
-
-/* Stickers */
-.sticker {
+/* Text Stickers */
+.textSticker {
   position: absolute;
   font-family: var(--font-comic);
-  font-size: 1rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  border: 3px solid currentColor;
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+  font-size: 1.1rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 12px;
+  border: 5px solid currentColor;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
   text-transform: uppercase;
   letter-spacing: 2px;
   z-index: 15;
 }
 
-.stickerFind {
-  top: 10%;
-  right: 15%;
+.stickerLove {
+  top: 6%;
+  right: 12%;
   background: var(--color-primary);
   color: var(--color-white);
   transform: rotate(10deg);
 }
 
-.stickerLove {
-  bottom: 12%;
-  left: 10%;
+.stickerForever {
+  bottom: 6%;
+  left: 8%;
   background: var(--color-pink);
   color: var(--surface-dark);
   transform: rotate(-8deg);
@@ -270,16 +330,22 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .mazeContainer {
-    width: min(350px, 85vw);
-    height: min(350px, 85vw);
+  .gameContainer {
+    width: min(340px, 80vw);
+    height: min(340px, 80vw);
   }
-  
-  .instructions {
-    font-size: 0.8rem;
+
+  .title {
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem;
   }
-  
-  .sticker {
-    font-size: 0.85rem;
+
+  .stickerImage {
+    width: 55px;
+  }
+
+  .textSticker {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.9rem;
   }
 }

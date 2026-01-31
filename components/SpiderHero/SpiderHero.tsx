@@ -4,6 +4,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Heart, Sparkles, Star, MessageCircle, Camera, Zap } from 'lucide-react';
 import styles from './SpiderHero.module.css';
+import { useContent } from '../../context/ContentContext';
+import InlineEditor from '../InlineEditor/InlineEditor';
 
 interface HangingImageProps {
   src: string;
@@ -52,73 +54,32 @@ const HangingImage: React.FC<HangingImageProps> = ({
       animate={
         hasDropped
           ? {
-              y: finalY,
-              opacity: 1,
-              rotate: finalRotate,
-            }
+            y: finalY,
+            opacity: 1,
+            rotate: finalRotate,
+          }
           : { y: -600, opacity: 0 }
       }
       transition={
         isBouncy
           ? {
-              delay,
-              type: 'spring',
-              stiffness: 120,
-              damping: 8,
-              mass: 1.2,
-            }
+            delay,
+            type: 'spring',
+            stiffness: 120,
+            damping: 8,
+            mass: 1.2,
+          }
           : {
-              delay,
-              type: 'spring',
-              stiffness: 80,
-              damping: 12,
-            }
+            delay,
+            type: 'spring',
+            stiffness: 80,
+            damping: 12,
+          }
       }
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onClick={() => setIsClicked(!isClicked)}
     >
-      {/* Web String */}
-      <motion.div
-        className={styles.webStringContainer}
-        animate={
-          isHovered
-            ? { scaleY: 0.95 }
-            : hasDropped
-            ? { scaleY: [1, 1.02, 1] }
-            : { scaleY: 1 }
-        }
-        transition={{ duration: 0.3 }}
-      >
-        <motion.img
-          src={webSrc}
-          alt="Web string"
-          className={styles.webString}
-          animate={
-            isHovered
-              ? {
-                  filter: 'brightness(1.5) drop-shadow(0 0 10px rgba(255,255,255,0.8))',
-                }
-              : hasDropped
-              ? {
-                  rotate: [0, 0.5, -0.5, 0],
-                }
-              : {}
-          }
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-        {/* Web vibration effect */}
-        {hasDropped && (
-          <motion.div
-            className={styles.webVibration}
-            animate={{
-              opacity: [0, 0.3, 0],
-              scaleX: [1, 1.1, 1],
-            }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
-          />
-        )}
-      </motion.div>
 
       {/* Image Frame */}
       <motion.div
@@ -127,10 +88,10 @@ const HangingImage: React.FC<HangingImageProps> = ({
           isClicked
             ? { scale: 1.2, zIndex: 100 }
             : isHovered
-            ? { scale: 1.05 }
-            : hasDropped
-            ? swayAnimation
-            : {}
+              ? { scale: 1.05 }
+              : hasDropped
+                ? swayAnimation
+                : {}
         }
         transition={
           isClicked
@@ -271,6 +232,8 @@ const SpiderHero: React.FC = () => {
     };
   }, []);
 
+  const { content, updateContent, isEditor } = useContent();
+
   const hangingImages = [
     {
       id: 's1',
@@ -403,7 +366,15 @@ const SpiderHero: React.FC = () => {
               damping: 10,
             }}
           >
-            Every hero has a story
+            {isEditor ? (
+              <InlineEditor text={content.comicTexts?.[2] || 'Every hero has a story'} isEditor={isEditor} onSave={(v) => {
+                const cur = content.comicTexts || [];
+                cur[2] = v;
+                updateContent({ comicTexts: cur });
+              }} />
+            ) : (
+              content.comicTexts?.[2] || 'Every hero has a story'
+            )}
           </motion.h1>
 
           <motion.p
@@ -417,7 +388,16 @@ const SpiderHero: React.FC = () => {
               damping: 10,
             }}
           >
-            And mine is written in your name
+            {isEditor ? (
+              <InlineEditor text={content.comicTexts?.[0] || 'And mine is written in your name'} isEditor={isEditor} onSave={(v) => {
+                const cur = content.comicTexts || [];
+                cur[0] = v;
+                updateContent({ comicTexts: cur });
+              }} />
+            ) : (
+              content.comicTexts?.[0] || 'And mine is written in your name'
+            )}
+
           </motion.p>
         </motion.div>
 

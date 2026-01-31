@@ -1,151 +1,62 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Sparkles, Star } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import styles from './SceneLetter.module.css';
 
 const SceneLetter: React.FC = () => {
   const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Ambient particles
-  const particles = Array.from({ length: 25 }, (_, i) => ({
-    id: i,
-    size: 2 + Math.random() * 4,
-    left: Math.random() * 100,
-    top: Math.random() * 100,
-    delay: Math.random() * 3,
-    duration: 4 + Math.random() * 3,
-  }));
+  // Sparkle stickers for opening effect
+  const sparklePositions = [
+    { left: '10%', top: '20%', delay: 0.1 },
+    { right: '15%', top: '25%', delay: 0.2 },
+    { left: '15%', bottom: '30%', delay: 0.3 },
+    { right: '10%', bottom: '25%', delay: 0.4 },
+  ];
 
-  const webStringVariants = {
-    hidden: { scaleY: 0, opacity: 0 },
-    visible: {
-      scaleY: 1,
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        ease: [0.34, 1.56, 0.64, 1],
-      },
-    },
-  };
+  // Letter content
+  const letterText = `Dear Love,
 
-  const letterVariants = {
-    hidden: { y: -200, opacity: 0, rotate: -15 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      rotate: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 60,
-        damping: 12,
-        delay: 0.5,
-      },
-    },
-    float: {
-      y: [0, -8, 0],
-      rotate: [-1, 1, -1],
-      transition: {
-        duration: 5,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      },
-    },
-  };
+Even heroes fall in love...
+and somehow, you became my favorite story.
 
-  const stickerVariants = {
-    hidden: { scale: 0, rotate: -20 },
-    visible: (rotation: number) => ({
-      scale: 1,
-      rotate: rotation,
-      transition: {
-        type: 'spring',
-        stiffness: 200,
-        damping: 15,
-        delay: 1.5,
-      },
-    }),
-  };
+Every moment with you feels like
+a page from a comic I never want to end.
+
+You are my greatest adventure,
+my sweetest chapter,
+and my happiest ending.
+
+Forever yours,
+Your Spider ❤️`;
 
   return (
     <section className={styles.letterSection} ref={ref}>
-      {/* Ambient Particles */}
-      <div className={styles.particlesContainer}>
-        {particles.map((particle) => (
-          <motion.div
-            key={particle.id}
-            className={styles.particle}
-            style={{
-              width: particle.size,
-              height: particle.size,
-              left: `${particle.left}%`,
-              top: `${particle.top}%`,
-            }}
-            animate={{
-              y: [-15, 15, -15],
-              x: [-5, 5, -5],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{
-              duration: particle.duration,
-              delay: particle.delay,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-        ))}
+      {/* Background Image - Lighter gradient */}
+      <div className={styles.backgroundImage}>
+        <img src="/images/back1.jpg" alt="Background" />
       </div>
+
+      {/* Overlays */}
+      <div className={styles.softOverlay} />
+      <div className={styles.paperTexture} />
       <div className={styles.grainOverlay} />
 
-      {/* Web Corner Decorations */}
-      <div className={`${styles.webCorner} ${styles.webCornerTopLeft}`}>
-        <svg className={styles.webCornerSvg} viewBox="0 0 100 100">
-          <path d="M 0 0 Q 50 10 100 0" className={styles.webCornerPath} />
-          <path d="M 0 0 Q 10 50 0 100" className={styles.webCornerPath} />
-          <path d="M 0 0 L 70 70" className={styles.webCornerPath} />
-          <path d="M 0 30 Q 30 40 50 30" className={styles.webCornerPath} />
-          <path d="M 30 0 Q 40 30 30 50" className={styles.webCornerPath} />
-        </svg>
-      </div>
-      <div className={`${styles.webCorner} ${styles.webCornerBottomRight}`}>
-        <svg className={styles.webCornerSvg} viewBox="0 0 100 100">
-          <path d="M 0 0 Q 50 10 100 0" className={styles.webCornerPath} />
-          <path d="M 0 0 Q 10 50 0 100" className={styles.webCornerPath} />
-          <path d="M 0 0 L 70 70" className={styles.webCornerPath} />
-          <path d="M 0 30 Q 30 40 50 30" className={styles.webCornerPath} />
-          <path d="M 30 0 Q 40 30 30 50" className={styles.webCornerPath} />
-        </svg>
-      </div>
-
-      {/* Floating Icons */}
-      <div className={styles.floatingIcons}>
-        <motion.div
-          className={styles.floatingIcon}
-          style={{ top: '20%', left: '15%', color: 'var(--color-pink)' }}
-          animate={{ y: [-10, 10, -10], rotate: [-5, 5, -5] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Heart size={28} />
-        </motion.div>
-        <motion.div
-          className={styles.floatingIcon}
-          style={{ top: '30%', right: '18%', color: 'var(--color-gold)' }}
-          animate={{ y: [8, -12, 8], rotate: [3, -3, 3] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        >
-          <Sparkles size={24} />
-        </motion.div>
-        <motion.div
-          className={styles.floatingIcon}
-          style={{ bottom: '25%', left: '20%', color: 'var(--color-gold-soft)' }}
-          animate={{ y: [-8, 12, -8], rotate: [-3, 3, -3] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-        >
-          <Star size={22} />
-        </motion.div>
-      </div>
+      {/* Background blur when letter is open */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className={styles.backgroundBlur}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Content */}
       <div className={styles.contentContainer}>
@@ -153,159 +64,258 @@ const SceneLetter: React.FC = () => {
           className={styles.title}
           initial={{ y: -30, opacity: 0 }}
           animate={inView ? { y: 0, opacity: 1 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
-          A Letter For You
+          A Love Letter
         </motion.h2>
 
-        {/* Letter with Web String */}
-        <div className={styles.letterContainer}>
-          {/* Web String */}
-          <motion.div
-            className={styles.webString}
-            variants={webStringVariants}
-            initial="hidden"
-            animate={inView ? 'visible' : 'hidden'}
-          />
+        {/* Comic Book Container */}
+        <motion.div
+          className={`${styles.comicBookContainer} ${isOpen ? styles.opened : ''}`}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={inView ? { scale: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          onClick={() => !isOpen && setIsOpen(true)}
+        >
+          {/* Closed State - Book cover */}
+          <AnimatePresence>
+            {!isOpen && (
+              <motion.div
+                className={styles.bookCover}
+                exit={{
+                  rotateY: -90,
+                  opacity: 0,
+                  transition: { duration: 0.6, ease: 'easeInOut' }
+                }}
+              >
+                <img src="/images/cover.png" alt="Love Letter" className={styles.bookCoverImage} />
+                <div className={styles.bookCoverOverlay} />
+                <motion.div
+                  className={styles.clickToOpen}
+                  animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Heart size={22} fill="var(--color-primary)" />
+                  <span>Click to Open</span>
+                </motion.div>
 
-          {/* Letter Frame */}
-          <motion.div
-            className={styles.letterFrame}
-            variants={letterVariants}
-            initial="hidden"
-            animate={inView ? ['visible', 'float'] : 'hidden'}
+                {/* Glow effect on hover */}
+                <motion.div
+                  className={styles.coverGlow}
+                  whileHover={{ opacity: 0.8 }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Open State - Letter inside */}
+          <AnimatePresence>
+            {isOpen && (
+              <>
+                {/* Left Page */}
+                <motion.div
+                  className={styles.pageLeft}
+                  initial={{ rotateY: -90 }}
+                  animate={{ rotateY: 0 }}
+                  transition={{ duration: 0.8, type: 'spring', stiffness: 80 }}
+                >
+                  <div className={styles.pageFold} />
+                  <motion.img
+                    src="/stickers/spi.png"
+                    alt="Sticker"
+                    className={styles.pageSticker}
+                    style={{ top: '10%', left: '5%', width: '60px' }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1, rotate: -10 }}
+                    transition={{ delay: 0.8, type: 'spring' }}
+                  />
+                  <motion.div
+                    className={styles.heartsDecor}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1 }}
+                  >
+                    <Heart size={30} fill="var(--color-primary)" />
+                    <Heart size={22} fill="var(--color-pink)" />
+                    <Heart size={26} fill="var(--color-primary)" />
+                  </motion.div>
+                </motion.div>
+
+                {/* Right Page - Letter content */}
+                <motion.div
+                  className={styles.pageRight}
+                  initial={{ rotateY: 90 }}
+                  animate={{ rotateY: 0 }}
+                  transition={{ duration: 0.8, type: 'spring', stiffness: 80, delay: 0.1 }}
+                >
+                  <div className={styles.pageFold} />
+                  <motion.div
+                    className={styles.letterContent}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.5 }}
+                  >
+                    {letterText.split('\n').map((line, i) => (
+                      <motion.p
+                        key={i}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.8 + i * 0.05 }}
+                      >
+                        {line || '\u00A0'}
+                      </motion.p>
+                    ))}
+                  </motion.div>
+
+                  <motion.img
+                    src="/stickers/aesthetic_heart_sticker___Pink_Web_Heart_Sticker-removebg-preview.png"
+                    alt="Heart Sticker"
+                    className={styles.pageSticker}
+                    style={{ bottom: '8%', right: '5%', width: '55px' }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1, rotate: 8 }}
+                    transition={{ delay: 1.2, type: 'spring' }}
+                  />
+                </motion.div>
+
+                {/* Sparkle effects */}
+                {sparklePositions.map((pos, i) => (
+                  <motion.div
+                    key={i}
+                    className={styles.sparkleEffect}
+                    style={pos}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: [0, 1.2, 1], opacity: [0, 1, 0.8] }}
+                    transition={{ delay: 0.6 + pos.delay, duration: 0.5 }}
+                  >
+                    <Sparkles size={24} color="var(--color-gold)" />
+                  </motion.div>
+                ))}
+
+                {/* Close button */}
+                <motion.button
+                  className={styles.closeButton}
+                  onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Close
+                </motion.button>
+              </>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Hint text */}
+        {!isOpen && (
+          <motion.p
+            className={styles.hintText}
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ delay: 1 }}
           >
-            {/* Paper Lines */}
-            <div className={styles.paperLines} />
-
-            {/* Corner Decorations */}
-            <div className={`${styles.cornerDecoration} ${styles.cornerTopLeft}`} />
-            <div className={`${styles.cornerDecoration} ${styles.cornerTopRight}`} />
-            <div className={`${styles.cornerDecoration} ${styles.cornerBottomLeft}`} />
-            <div className={`${styles.cornerDecoration} ${styles.cornerBottomRight}`} />
-
-            {/* Wax Seal */}
-            <motion.div
-              className={styles.waxSeal}
-              initial={{ scale: 0, rotate: -180 }}
-              animate={inView ? { scale: 1, rotate: 0 } : {}}
-              transition={{ type: 'spring', delay: 1.2 }}
-            >
-              <Heart size={24} fill="currentColor" />
-            </motion.div>
-
-            {/* Letter Content */}
-            <div className={styles.letterContent}>
-              <p className={styles.letterDate}>January 30, 2026</p>
-              
-              <p className={styles.letterGreeting}>My Dearest,</p>
-              
-              <div className={styles.letterBody}>
-                <p>
-                  From the moment our paths crossed, my world changed in ways I never 
-                  thought possible. You brought color to my days and warmth to my heart 
-                  that I never knew I was missing.
-                </p>
-                <p>
-                  Every moment with you feels like a scene from our own love story - 
-                  one that I never want to end. You are my partner, my confidant, my 
-                  best friend, and the love of my life.
-                </p>
-                <p>
-                  Thank you for being you. Thank you for choosing me. Thank you for 
-                  making every ordinary day feel extraordinary.
-                </p>
-              </div>
-              
-              <p className={styles.letterClosing}>Forever and always yours,</p>
-              <p className={styles.signature}>With All My Love</p>
-            </div>
-          </motion.div>
-        </div>
+            ❤️ Tap to read my love letter ❤️
+          </motion.p>
+        )}
       </div>
 
-      {/* Stickers */}
-      <motion.div
-        className={styles.comicSticker}
-        style={{
-          top: '8%',
-          left: '5%',
-          backgroundColor: '#e63946',
-          transform: 'rotate(-10deg)',
+      {/* Corner Stickers with bouncy/windy animations */}
+      <motion.img
+        src="/stickers/web1.png"
+        alt="Sticker"
+        className={styles.stickerImage}
+        style={{ top: '5%', left: '3%' }}
+        initial={{ scale: 0, rotate: -15 }}
+        animate={inView ? {
+          scale: 1,
+          rotate: [-8, -3, -8],
+          y: [0, -6, 0],
+        } : {}}
+        transition={{
+          delay: 0.6,
+          type: 'spring',
+          stiffness: 150,
+          rotate: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+          y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
         }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={inView ? { scale: 1, opacity: 1 } : {}}
-        transition={{ delay: 2, type: 'spring', stiffness: 200 }}
-        whileHover={{ scale: 1.1, rotate: '-15deg' }}
-      >
-        <span>ROMANCE</span>
-      </motion.div>
-
-      <motion.div
-        className={styles.comicSticker}
-        style={{
-          top: '15%',
-          right: '8%',
-          backgroundColor: '#ffd700',
-          transform: 'rotate(12deg)',
+      />
+      <motion.img
+        src="/stickers/spi2.png"
+        alt="Sticker"
+        className={styles.stickerImage}
+        style={{ top: '8%', right: '4%' }}
+        initial={{ scale: 0, rotate: 15 }}
+        animate={inView ? {
+          scale: 1,
+          rotate: [10, 15, 10],
+          y: [0, 5, 0],
+        } : {}}
+        transition={{
+          delay: 0.8,
+          type: 'spring',
+          stiffness: 150,
+          rotate: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+          y: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
         }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={inView ? { scale: 1, opacity: 1 } : {}}
-        transition={{ delay: 2.3, type: 'spring', stiffness: 200 }}
-        whileHover={{ scale: 1.1, rotate: '17deg' }}
-      >
-        <span>HEART</span>
-      </motion.div>
-
-      <motion.div
-        className={styles.comicSticker}
-        style={{
-          bottom: '25%',
-          left: '8%',
-          backgroundColor: '#457b9d',
-          transform: 'rotate(-8deg)',
+      />
+      <motion.img
+        src="/stickers/sleep.png"
+        alt="Sticker"
+        className={styles.stickerImage}
+        style={{ bottom: '5%', right: '5%' }}
+        initial={{ scale: 0, rotate: -10 }}
+        animate={inView ? {
+          scale: [1, 1.08, 1],
+          rotate: [5, 10, 5],
+        } : {}}
+        transition={{
+          delay: 1,
+          type: 'spring',
+          stiffness: 150,
+          scale: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+          rotate: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
         }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={inView ? { scale: 1, opacity: 1 } : {}}
-        transition={{ delay: 2.6, type: 'spring', stiffness: 200 }}
-        whileHover={{ scale: 1.1, rotate: '-13deg' }}
-      >
-        <span>LOVE</span>
-      </motion.div>
-
-      <motion.div
-        className={styles.comicSticker}
-        style={{
-          bottom: '18%',
-          right: '5%',
-          backgroundColor: '#e63946',
-          transform: 'rotate(10deg)',
+      />
+      <motion.img
+        src="/stickers/spi.png"
+        alt="Sticker"
+        className={styles.stickerImage}
+        style={{ bottom: '8%', left: '4%', width: '70px' }}
+        initial={{ scale: 0, rotate: 10 }}
+        animate={inView ? {
+          scale: [1, 1.1, 1],
+          rotate: [-5, 0, -5],
+          y: [0, -8, 0],
+        } : {}}
+        transition={{
+          delay: 1.2,
+          type: 'spring',
+          stiffness: 130,
+          scale: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+          rotate: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+          y: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
         }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={inView ? { scale: 1, opacity: 1 } : {}}
-        transition={{ delay: 2.9, type: 'spring', stiffness: 200 }}
-        whileHover={{ scale: 1.1, rotate: '15deg' }}
-      >
-        <span>KISSES</span>
-      </motion.div>
+      />
 
+      {/* Text Stickers */}
       <motion.div
-        className={`${styles.sticker} ${styles.stickerLetter}`}
-        variants={stickerVariants}
-        initial="hidden"
-        animate={inView ? 'visible' : 'hidden'}
-        custom={10}
+        className={`${styles.textSticker} ${styles.stickerLove}`}
+        initial={{ scale: 0 }}
+        animate={inView ? { scale: 1 } : {}}
+        transition={{ delay: 1.4, type: 'spring' }}
       >
-        LETTER
+        MY LOVE
       </motion.div>
       <motion.div
-        className={`${styles.sticker} ${styles.stickerXoxo}`}
-        variants={stickerVariants}
-        initial="hidden"
-        animate={inView ? 'visible' : 'hidden'}
-        custom={-8}
+        className={`${styles.textSticker} ${styles.stickerForever}`}
+        initial={{ scale: 0 }}
+        animate={inView ? { scale: 1 } : {}}
+        transition={{ delay: 1.6, type: 'spring' }}
       >
-        XOXO
+        ALWAYS
       </motion.div>
     </section>
   );

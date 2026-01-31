@@ -6,28 +6,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    180deg,
-    #1e1a2e 0%,
-    #2d2535 30%,
-    #3d2d45 50%,
-    #2d2535 70%,
-    #1e1a2e 100%
-  );
 }
 
-/* Ambient Particles */
-.particlesContainer {
+/* Background Image - LIGHTER for letter section */
+.backgroundImage {
   position: absolute;
   inset: 0;
-  pointer-events: none;
+  z-index: 0;
+}
+
+.backgroundImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.8) saturate(1.1) contrast(0.9);
+}
+
+/* Overlays - Much lighter for letter section */
+.softOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+      rgba(80, 65, 90, 0.25) 0%,
+      rgba(70, 55, 80, 0.2) 50%,
+      rgba(80, 65, 90, 0.3) 100%);
   z-index: 1;
 }
 
-.particle {
+.paperTexture {
   position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.6), transparent 70%);
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, transparent 49.5%, rgba(255, 255, 255, 0.01) 50%, transparent 50.5%),
+    linear-gradient(0deg, transparent 49.5%, rgba(255, 255, 255, 0.01) 50%, transparent 50.5%);
+  background-size: 20px 20px, 100px 100px, 100px 100px;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .grainOverlay {
@@ -35,7 +50,16 @@
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
+}
+
+/* Background Blur when letter is open */
+.backgroundBlur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(8px);
+  background: rgba(30, 35, 55, 0.4);
+  z-index: 5;
 }
 
 /* Content Container */
@@ -46,290 +70,322 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  max-width: 900px;
+  gap: 1.5rem;
 }
 
 /* Title */
 .title {
   font-family: var(--font-comic);
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
   color: var(--color-white);
   text-transform: uppercase;
-  letter-spacing: 3px;
-  text-align: center;
-  text-shadow: 
+  letter-spacing: 4px;
+  text-shadow:
     3px 3px 0 var(--color-primary),
-    6px 6px 0 rgba(0, 0, 0, 0.3);
-  margin-bottom: 2rem;
+    6px 6px 0 rgba(0, 0, 0, 0.5);
+  text-align: center;
+  padding: 1rem 2.5rem;
+  background: rgba(26, 39, 68, 0.95);
+  border: 5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.5);
 }
 
-/* Letter Container */
-.letterContainer {
+/* Comic Book Container */
+.comicBookContainer {
   position: relative;
+  width: 340px;
+  height: 440px;
+  perspective: 1500px;
+  cursor: pointer;
+}
+
+.comicBookContainer.opened {
+  width: 600px;
+  cursor: default;
+}
+
+/* Book Cover (Closed State) */
+.bookCover {
+  position: absolute;
+  inset: 0;
+  border: 8px solid rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a2744, #2d2448);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    10px 10px 0 rgba(0, 0, 0, 0.5);
+  transform-origin: left center;
+}
+
+.bookCover::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border: 5px solid rgba(0, 0, 0, 0.85);
+  border-radius: 22px;
+  pointer-events: none;
+}
+
+.bookCoverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.bookCoverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), transparent, rgba(69, 123, 157, 0.1));
+  pointer-events: none;
+}
+
+.clickToOpen {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(15, 22, 41, 0.9);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 25px;
+  color: var(--color-white);
+  font-family: var(--font-comic);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+}
+
+.coverGlow {
+  position: absolute;
+  inset: -5px;
+  border-radius: 20px;
+  background: radial-gradient(circle at center, rgba(230, 57, 70, 0.4), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.bookCover:hover .coverGlow {
+  opacity: 0.6;
+}
+
+/* Open State - Pages */
+.pageLeft,
+.pageRight {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg, #f5f0e6, #efe8d8);
+  border: 6px solid rgba(120, 100, 80, 0.5);
+  transform-origin: right center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.3),
+    inset 0 0 30px rgba(120, 100, 80, 0.1);
+  overflow: hidden;
 }
 
-/* Web String */
-.webString {
-  width: 3px;
-  height: 80px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
-  transform-origin: top center;
-  animation: webSway 4s infinite ease-in-out;
+.pageLeft {
+  left: 0;
+  transform-origin: right center;
+  border-radius: 12px 0 0 12px;
 }
 
-@keyframes webSway {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
+.pageRight {
+  right: 0;
+  transform-origin: left center;
+  border-radius: 0 12px 12px 0;
 }
 
-/* Letter Frame */
-.letterFrame {
-  position: relative;
-  background: linear-gradient(135deg, #f5f0e6 0%, #e8e0d0 100%);
-  padding: 3rem;
-  border-radius: 8px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 0 30px rgba(0, 0, 0, 0.05),
-    8px 8px 0 rgba(0, 0, 0, 0.3);
-  max-width: 600px;
-  transform-origin: top center;
-}
-
-/* Wax Seal */
-.waxSeal {
+.pageFold {
   position: absolute;
-  top: -20px;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent);
+}
+
+.pageLeft .pageFold {
+  right: 0;
+}
+
+.pageRight .pageFold {
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08));
+}
+
+/* Hearts Decor on Left Page */
+.heartsDecor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  opacity: 0.8;
+}
+
+/* Letter Content on Right Page */
+.letterContent {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: #3a3020;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.letterContent p {
+  margin: 0.2rem 0;
+}
+
+/* Page Stickers */
+.pageSticker {
+  position: absolute;
+  opacity: 0.9;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+/* Sparkle Effects */
+.sparkleEffect {
+  position: absolute;
+  z-index: 20;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+}
+
+/* Close Button */
+.closeButton {
+  position: absolute;
+  bottom: -50px;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle at 30% 30%, #c1121f, #8b0000);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 
-    0 4px 15px rgba(0, 0, 0, 0.4),
-    inset 0 -3px 10px rgba(0, 0, 0, 0.3);
-}
-
-.waxSeal svg {
-  color: rgba(255, 255, 255, 0.9);
-  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
-}
-
-/* Letter Content */
-.letterContent {
-  color: #3a3a3a;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  line-height: 2;
-}
-
-.letterDate {
-  text-align: right;
-  font-style: italic;
-  color: #666;
-  margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-}
-
-.letterGreeting {
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
-  color: var(--color-primary-dark);
-}
-
-.letterBody {
-  margin-bottom: 1.5rem;
-  text-align: justify;
-}
-
-.letterBody p {
-  margin-bottom: 1rem;
-  text-indent: 2rem;
-}
-
-.letterClosing {
-  text-align: right;
-  font-style: italic;
-  margin-top: 2rem;
-}
-
-.signature {
-  font-family: 'Brush Script MT', cursive, var(--font-display);
-  font-size: 2rem;
-  color: var(--color-primary-dark);
-  text-align: right;
-  margin-top: 0.5rem;
-}
-
-/* Paper Texture Lines */
-.paperLines {
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 31px,
-    rgba(100, 100, 200, 0.1) 31px,
-    rgba(100, 100, 200, 0.1) 32px
-  );
-  pointer-events: none;
-  border-radius: 8px;
-}
-
-/* Corner Decorations */
-.cornerDecoration {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  opacity: 0.3;
-}
-
-.cornerTopLeft {
-  top: 15px;
-  left: 15px;
-  border-top: 2px solid var(--color-primary-dark);
-  border-left: 2px solid var(--color-primary-dark);
-}
-
-.cornerTopRight {
-  top: 15px;
-  right: 15px;
-  border-top: 2px solid var(--color-primary-dark);
-  border-right: 2px solid var(--color-primary-dark);
-}
-
-.cornerBottomLeft {
-  bottom: 15px;
-  left: 15px;
-  border-bottom: 2px solid var(--color-primary-dark);
-  border-left: 2px solid var(--color-primary-dark);
-}
-
-.cornerBottomRight {
-  bottom: 15px;
-  right: 15px;
-  border-bottom: 2px solid var(--color-primary-dark);
-  border-right: 2px solid var(--color-primary-dark);
-}
-
-/* Floating Icons */
-.floatingIcons {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.floatingIcon {
-  position: absolute;
-  opacity: 0.4;
-}
-
-/* Web Corner Decorations */
-.webCorner {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  pointer-events: none;
-  z-index: 3;
-}
-
-.webCornerSvg {
-  width: 100%;
-  height: 100%;
-}
-
-.webCornerPath {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.3);
-  stroke-width: 1.5;
-}
-
-.webCornerTopLeft {
-  top: 0;
-  left: 0;
-}
-
-.webCornerBottomRight {
-  bottom: 0;
-  right: 0;
-  transform: rotate(180deg);
-}
-
-/* Stickers */
-.sticker {
-  position: absolute;
+  padding: 0.7rem 1.5rem;
   font-family: var(--font-comic);
   font-size: 1rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  border: 3px solid currentColor;
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+  color: var(--surface-dark);
+  background: var(--color-gold);
+  border: 4px solid var(--surface-dark);
+  border-radius: 25px;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Hint Text */
+.hintText {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Sticker Images */
+.stickerImage {
+  position: absolute;
+  width: 95px;
+  height: auto;
+  opacity: 0.95;
+  filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.5));
+  z-index: 12;
+  cursor: pointer;
+}
+
+.stickerImage:hover {
+  filter: drop-shadow(6px 6px 12px rgba(230, 57, 70, 0.6));
+}
+
+/* Text Stickers */
+.textSticker {
+  position: absolute;
+  font-family: var(--font-comic);
+  font-size: 1.1rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 12px;
+  border: 5px solid currentColor;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.5);
   text-transform: uppercase;
   letter-spacing: 2px;
   z-index: 15;
 }
 
-.stickerLetter {
-  top: 15%;
-  right: 10%;
-  background: var(--color-gold);
-  color: var(--surface-dark);
+.stickerLove {
+  top: 6%;
+  right: 12%;
+  background: var(--color-primary);
+  color: var(--color-white);
   transform: rotate(10deg);
 }
 
-.stickerXoxo {
-  bottom: 18%;
+.stickerForever {
+  bottom: 6%;
   left: 8%;
-  background: var(--color-pink);
+  background: var(--color-gold);
   color: var(--surface-dark);
   transform: rotate(-8deg);
 }
 
-/* Comic Stickers */
-.comicSticker {
-  position: absolute;
-  padding: 0.8rem 1.2rem;
-  border: 4px solid #0a0a1a;
-  border-radius: 12px;
-  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
-  z-index: 15;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.comicSticker span {
-  font-family: 'Bangers', 'Impact', sans-serif;
-  font-size: clamp(1rem, 2vw, 1.5rem);
-  font-weight: 900;
-  color: #0a0a1a;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
-  .letterFrame {
-    padding: 2rem 1.5rem;
-    margin: 0 1rem;
+  .comicBookContainer {
+    width: 280px;
+    height: 360px;
   }
-  
+
+  .comicBookContainer.opened {
+    width: 90vw;
+    max-width: 500px;
+  }
+
   .letterContent {
-    font-size: 1rem;
-    line-height: 1.8;
+    font-size: 0.75rem;
   }
-  
-  .signature {
-    font-size: 1.5rem;
+
+  .pageLeft,
+  .pageRight {
+    padding: 1rem;
   }
-  
-  .webString {
-    height: 50px;
+
+  .title {
+    font-size: 1.25rem;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .stickerImage {
+    width: 55px;
+  }
+
+  .textSticker {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .comicBookContainer {
+    width: 260px;
+    height: 340px;
+  }
+
+  .letterContent {
+    font-size: 0.65rem;
+  }
+
+  .heartsDecor {
+    transform: scale(0.8);
   }
 }

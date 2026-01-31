@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Heart, Star } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import styles from './Scene4Collage.module.css';
+import { useContent } from '../../context/ContentContext';
+import InlineEditor from '../InlineEditor/InlineEditor';
 
 interface Photo {
   id: number;
@@ -17,8 +19,9 @@ interface Photo {
 const Scene4Collage: React.FC = () => {
   const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const { content, updateContent, isEditor } = useContent();
 
-  const photos: Photo[] = [
+  const defaultPhotos: Photo[] = [
     { id: 1, src: '/images/s1.png', caption: 'Our First Day', rotation: -5 },
     { id: 2, src: '/images/s2.png', caption: 'Best Moment', rotation: 3, useTapeAlt: true },
     { id: 3, src: '/images/s3.png', caption: 'Together Forever', rotation: -2 },
@@ -26,6 +29,14 @@ const Scene4Collage: React.FC = () => {
     { id: 5, src: '/images/web2.png', caption: 'Intertwined', rotation: -4 },
     { id: 6, src: '/images/bg.png', caption: 'Our World', rotation: 2, useTapeAlt: true },
   ];
+
+  const photos: Photo[] = (content.scene4Collage?.images || defaultPhotos.map(p => p.src)).map((src, idx) => ({
+    id: idx + 1,
+    src,
+    caption: content.scene4Collage?.captions?.[idx] || defaultPhotos[idx]?.caption || '',
+    rotation: defaultPhotos[idx]?.rotation || 0,
+    useTapeAlt: defaultPhotos[idx]?.useTapeAlt,
+  }));
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -80,6 +91,11 @@ const Scene4Collage: React.FC = () => {
 
   return (
     <section className={styles.collageSection} ref={ref}>
+      {/* Background Image */}
+      <div className={styles.backgroundImage}>
+        <img src="/images/back2.png" alt="Background" />
+      </div>
+
       {/* Background Textures */}
       <div className={styles.scrapbookTexture} />
       <div className={styles.grainOverlay} />
@@ -102,7 +118,7 @@ const Scene4Collage: React.FC = () => {
           initial="hidden"
           animate={inView ? 'visible' : 'hidden'}
         >
-          {photos.map((photo) => (
+          {photos.map((photo, idx) => (
             <motion.div
               key={photo.id}
               className={styles.photoWrapper}
@@ -114,7 +130,7 @@ const Scene4Collage: React.FC = () => {
                 className={styles.webString}
                 variants={webStringVariants}
               />
-              
+
               {/* Photo Frame */}
               <motion.div
                 className={styles.photoFrame}
@@ -128,7 +144,17 @@ const Scene4Collage: React.FC = () => {
                   alt={photo.caption}
                   className={styles.photoImage}
                 />
-                <span className={styles.photoCaption}>{photo.caption}</span>
+                <span className={styles.photoCaption}>
+                  <InlineEditor
+                    text={photo.caption}
+                    isEditor={isEditor}
+                    onSave={(v) => {
+                      const curCaps = content.scene4Collage?.captions ? [...content.scene4Collage.captions] : photos.map(p => p.caption);
+                      curCaps[idx] = v;
+                      updateContent({ scene4Collage: { images: content.scene4Collage?.images || photos.map(p => p.src), captions: curCaps } });
+                    }}
+                  />
+                </span>
               </motion.div>
             </motion.div>
           ))}
@@ -173,7 +199,7 @@ const Scene4Collage: React.FC = () => {
         animate={inView ? { scale: 1, opacity: 1 } : {}}
         transition={{ delay: 1.5, type: 'spring' }}
       >
-        So many memories!
+        <InlineEditor text={content.comicTexts?.[0] || 'So many memories!'} isEditor={isEditor} onSave={(v) => { const cur = content.comicTexts || []; cur[0] = v; updateContent({ comicTexts: cur }); }} />
       </motion.div>
       <motion.div
         className={`${styles.speechBubble} ${styles.bubble2}`}
@@ -181,7 +207,7 @@ const Scene4Collage: React.FC = () => {
         animate={inView ? { scale: 1, opacity: 1 } : {}}
         transition={{ delay: 1.8, type: 'spring' }}
       >
-        Each one special
+        <InlineEditor text={content.comicTexts?.[1] || 'Each one special'} isEditor={isEditor} onSave={(v) => { const cur = content.comicTexts || []; cur[1] = v; updateContent({ comicTexts: cur }); }} />
       </motion.div>
 
       {/* Modal */}
@@ -294,6 +320,51 @@ const Scene4Collage: React.FC = () => {
       >
         <span>LOVE</span>
       </motion.div>
+      {/* Editor-only: Collage image upload controls below section */}
+      {isEditor && (
+        <div className={styles.uploadPanel}>
+          <h3 className={styles.uploadTitle}>
+            <Heart size={18} />
+            Update Collage Gallery
+          </h3>
+          <div className={styles.uploadGrid}>
+            {photos.map((p, idx) => (
+              <div key={p.id} className={styles.uploadCard}>
+                <span className={styles.uploadLabel}>Photo {idx + 1}</span>
+                <div
+                  className={styles.uploadPreview}
+                  style={{ backgroundImage: `url(${p.src})` }}
+                />
+                <label className={styles.uploadButton}>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className={styles.uploadInput}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (!f) return;
+                      if (f.size > 2 * 1024 * 1024) {
+                        console.warn('File must be under 2MB');
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        const url = ev.target?.result as string;
+                        const curImgs = content.scene4Collage?.images ? [...content.scene4Collage.images] : photos.map(pp => pp.src);
+                        curImgs[idx] = url;
+                        updateContent({ scene4Collage: { images: curImgs, captions: content.scene4Collage?.captions || photos.map(pp => pp.caption) } });
+                      };
+                      reader.readAsDataURL(f);
+                    }}
+                  />
+                  <Star size={12} />
+                  Upload
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 };
