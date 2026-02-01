@@ -1,132 +1,120 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Sparkles, RotateCcw } from 'lucide-react';
+import { Heart, Sparkles, RotateCcw, Star, Zap } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import styles from './Scene3Maze.module.css';
 
-interface FloatingHeart {
+interface Card {
   id: number;
-  x: number;
-  y: number;
-  size: number;
-  caught: boolean;
+  emoji: string;
+  isFlipped: boolean;
+  isMatched: boolean;
 }
+
+const CARD_PAIRS = ['💕', '💖', '💗', '💝', '🦋', '🌹'];
 
 const Scene3Maze: React.FC = () => {
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true });
-  const gameRef = useRef<HTMLDivElement>(null);
 
   // Game state
+  const [cards, setCards] = useState<Card[]>([]);
+  const [flippedCards, setFlippedCards] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState({ x: 50, y: 50 });
-  const [hearts, setHearts] = useState<FloatingHeart[]>([]);
-  const [caughtCount, setCaughtCount] = useState(0);
-  const [showMessage, setShowMessage] = useState('');
   const [hasWon, setHasWon] = useState(false);
-  const [stickerBurst, setStickerBurst] = useState<{ x: number; y: number } | null>(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [combo, setCombo] = useState(0);
+  const [showCombo, setShowCombo] = useState(false);
 
-  // Generate hearts
-  const generateHearts = useCallback(() => {
-    return Array.from({ length: 5 }, (_, i) => ({
-      id: Date.now() + i,
-      x: 15 + Math.random() * 70,
-      y: 15 + Math.random() * 70,
-      size: 28 + Math.random() * 18,
-      caught: false,
-    }));
-  }, []);
-
-  // Start game
-  const startGame = useCallback(() => {
+  // Initialize cards
+  const initializeGame = useCallback(() => {
+    const shuffled = [...CARD_PAIRS, ...CARD_PAIRS]
+      .sort(() => Math.random() - 0.5)
+      .map((emoji, index) => ({
+        id: index,
+        emoji,
+        isFlipped: false,
+        isMatched: false,
+      }));
+    setCards(shuffled);
+    setFlippedCards([]);
+    setMoves(0);
     setIsPlaying(true);
     setHasWon(false);
-    setCaughtCount(0);
-    setShowMessage('');
-    setHearts(generateHearts());
-  }, [generateHearts]);
+    setCombo(0);
+  }, []);
+
+  // Handle card click
+  const handleCardClick = useCallback((cardId: number) => {
+    if (isChecking || flippedCards.length >= 2) return;
+    
+    const card = cards.find(c => c.id === cardId);
+    if (!card || card.isFlipped || card.isMatched) return;
+
+    const newFlipped = [...flippedCards, cardId];
+    setFlippedCards(newFlipped);
+    
+    setCards(prev => prev.map(c => 
+      c.id === cardId ? { ...c, isFlipped: true } : c
+    ));
+
+    if (newFlipped.length === 2) {
+      setMoves(m => m + 1);
+      setIsChecking(true);
+
+      const [first, second] = newFlipped;
+      const firstCard = cards.find(c => c.id === first);
+      const secondCard = cards.find(c => c.id === second);
+
+      if (firstCard?.emoji === secondCard?.emoji) {
+        // Match found!
+        setCombo(c => c + 1);
+        setShowCombo(true);
+        setTimeout(() => setShowCombo(false), 800);
+        
+        setTimeout(() => {
+          setCards(prev => prev.map(c => 
+            c.id === first || c.id === second 
+              ? { ...c, isMatched: true } 
+              : c
+          ));
+          setFlippedCards([]);
+          setIsChecking(false);
+        }, 500);
+      } else {
+        // No match
+        setCombo(0);
+        setTimeout(() => {
+          setCards(prev => prev.map(c => 
+            c.id === first || c.id === second 
+              ? { ...c, isFlipped: false } 
+              : c
+          ));
+          setFlippedCards([]);
+          setIsChecking(false);
+        }, 1000);
+      }
+    }
+  }, [cards, flippedCards, isChecking]);
+
+  // Check for win
+  useEffect(() => {
+    if (isPlaying && cards.length > 0 && cards.every(c => c.isMatched)) {
+      setTimeout(() => setHasWon(true), 500);
+    }
+  }, [cards, isPlaying]);
 
   // Reset game
   const resetGame = useCallback(() => {
     setIsPlaying(false);
     setHasWon(false);
-    setCaughtCount(0);
-    setShowMessage('');
-    setHearts([]);
+    setCards([]);
+    setFlippedCards([]);
+    setMoves(0);
+    setCombo(0);
   }, []);
-
-  // Handle cursor movement
-  const handleMove = useCallback((clientX: number, clientY: number) => {
-    if (!gameRef.current || !isPlaying || hasWon) return;
-
-    const rect = gameRef.current.getBoundingClientRect();
-    const x = ((clientX - rect.left) / rect.width) * 100;
-    const y = ((clientY - rect.top) / rect.height) * 100;
-
-    setCursorPosition({
-      x: Math.max(5, Math.min(95, x)),
-      y: Math.max(5, Math.min(95, y))
-    });
-  }, [isPlaying, hasWon]);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    handleMove(e.clientX, e.clientY);
-  }, [handleMove]);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    handleMove(e.touches[0].clientX, e.touches[0].clientY);
-  }, [handleMove]);
-
-  // Check for heart catches
-  useEffect(() => {
-    if (!isPlaying || hasWon) return;
-
-    const catchRadius = 8;
-    let newCaughtCount = 0;
-    let justCaught = false;
-    let caughtPosition = { x: 0, y: 0 };
-
-    const updatedHearts = hearts.map(heart => {
-      if (heart.caught) {
-        newCaughtCount++;
-        return heart;
-      }
-
-      const distance = Math.sqrt(
-        Math.pow(heart.x - cursorPosition.x, 2) +
-        Math.pow(heart.y - cursorPosition.y, 2)
-      );
-
-      if (distance < catchRadius) {
-        newCaughtCount++;
-        justCaught = true;
-        caughtPosition = { x: heart.x, y: heart.y };
-        return { ...heart, caught: true };
-      }
-
-      return heart;
-    });
-
-    if (justCaught) {
-      setHearts(updatedHearts);
-      setCaughtCount(newCaughtCount);
-      setStickerBurst(caughtPosition);
-      setShowMessage('You caught my heart! 💕');
-
-      setTimeout(() => {
-        setShowMessage('');
-        setStickerBurst(null);
-      }, 1200);
-
-      // Check for win
-      if (newCaughtCount >= 3) {
-        setTimeout(() => {
-          setHasWon(true);
-        }, 1000);
-      }
-    }
-  }, [cursorPosition, hearts, isPlaying, hasWon]);
 
   // Floating stickers for win
   const winStickers = [
@@ -143,6 +131,13 @@ const Scene3Maze: React.FC = () => {
     delay: Math.random() * 0.5,
     size: 14 + Math.random() * 14,
   }));
+
+  // Get star rating based on moves
+  const getStarRating = () => {
+    if (moves <= 8) return 3;
+    if (moves <= 12) return 2;
+    return 1;
+  };
 
   return (
     <section className={styles.mazeSection} ref={ref}>
@@ -164,119 +159,99 @@ const Scene3Maze: React.FC = () => {
           animate={inView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          Catch My Heart
+          Memory of Love
         </motion.h2>
 
-        {/* Caught Counter */}
+        {/* Game Stats */}
         {isPlaying && !hasWon && (
           <motion.div
-            className={styles.caughtCounter}
+            className={styles.gameStats}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
           >
-            <Heart size={22} fill="var(--color-primary)" />
-            <span>{caughtCount} / 3 Hearts</span>
+            <div className={styles.statItem}>
+              <Zap size={18} />
+              <span>Moves: {moves}</span>
+            </div>
+            <div className={styles.statItem}>
+              <Heart size={18} fill="var(--color-primary)" />
+              <span>Pairs: {cards.filter(c => c.isMatched).length / 2} / 6</span>
+            </div>
           </motion.div>
         )}
 
-        {/* Message Bubble */}
+        {/* Combo Indicator */}
         <AnimatePresence>
-          {showMessage && (
+          {showCombo && combo > 1 && (
             <motion.div
-              className={styles.messageBubble}
+              className={styles.comboIndicator}
               initial={{ scale: 0, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 200 }}
+              transition={{ type: 'spring', stiffness: 300 }}
             >
-              {showMessage}
+              <Sparkles size={20} />
+              {combo}x Combo!
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Game Container */}
         <motion.div
-          ref={gameRef}
           className={styles.gameContainer}
-          onMouseMove={handleMouseMove}
-          onTouchMove={handleTouchMove}
           initial={{ scale: 0.9, opacity: 0 }}
           animate={inView ? { scale: 1, opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          {/* Floating Hearts */}
-          {hearts.map((heart) => (
-            <motion.div
-              key={heart.id}
-              className={`${styles.floatingHeart} ${heart.caught ? styles.caught : ''}`}
-              style={{
-                left: `${heart.x}%`,
-                top: `${heart.y}%`,
-              }}
-              animate={!heart.caught ? {
-                y: [0, -15, 0],
-                x: [0, 8, 0, -8, 0],
-                rotate: [-5, 5, -5],
-              } : {
-                scale: 0,
-                opacity: 0,
-              }}
-              transition={!heart.caught ? {
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              } : {
-                duration: 0.3,
-              }}
-            >
-              <Heart size={heart.size} fill="var(--color-primary)" color="var(--color-primary)" />
-            </motion.div>
-          ))}
-
-          {/* Web Cursor */}
+          {/* Card Grid */}
           {isPlaying && !hasWon && (
-            <motion.div
-              className={styles.webCursor}
-              style={{
-                left: `${cursorPosition.x}%`,
-                top: `${cursorPosition.y}%`,
-              }}
-              animate={{
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, 0, -5, 0],
-              }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <div className={styles.webCursorInner}>
-                <Sparkles size={18} />
-              </div>
-            </motion.div>
+            <div className={styles.cardGrid}>
+              {cards.map((card) => (
+                <motion.div
+                  key={card.id}
+                  className={`${styles.card} ${card.isFlipped || card.isMatched ? styles.flipped : ''} ${card.isMatched ? styles.matched : ''}`}
+                  onClick={() => handleCardClick(card.id)}
+                  whileHover={!card.isFlipped && !card.isMatched ? { scale: 1.05 } : {}}
+                  whileTap={!card.isFlipped && !card.isMatched ? { scale: 0.95 } : {}}
+                  initial={{ rotateY: 0 }}
+                  animate={{ 
+                    rotateY: card.isFlipped || card.isMatched ? 180 : 0,
+                    scale: card.isMatched ? [1, 1.1, 1] : 1,
+                  }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <div className={styles.cardInner}>
+                    <div className={styles.cardFront}>
+                      <Heart size={24} />
+                    </div>
+                    <div className={styles.cardBack}>
+                      <span className={styles.cardEmoji}>{card.emoji}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           )}
-
-          {/* Sticker Burst Effect */}
-          <AnimatePresence>
-            {stickerBurst && (
-              <motion.div
-                className={styles.stickerBurst}
-                style={{
-                  left: `${stickerBurst.x}%`,
-                  top: `${stickerBurst.y}%`,
-                }}
-                initial={{ scale: 0, opacity: 1 }}
-                animate={{ scale: 2, opacity: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              />
-            )}
-          </AnimatePresence>
 
           {/* Start Overlay */}
           {!isPlaying && !hasWon && (
             <motion.div className={styles.startOverlay}>
-              <button className={styles.startButton} onClick={startGame}>
-                <Heart size={22} fill="white" />
-                Start Catching
-              </button>
+              <div className={styles.startContent}>
+                <motion.div 
+                  className={styles.startIcon}
+                  animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Heart size={48} fill="var(--color-primary)" />
+                </motion.div>
+                <p className={styles.startDescription}>
+                  Match the pairs to unlock a special message!
+                </p>
+                <button className={styles.startButton} onClick={initializeGame}>
+                  <Sparkles size={22} />
+                  Start Game
+                </button>
+              </div>
             </motion.div>
           )}
 
@@ -328,9 +303,32 @@ const Scene3Maze: React.FC = () => {
                   animate={{ scale: 1, y: 0 }}
                   transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
                 >
-                  <div className={styles.victoryMessage}>
-                    No matter what, my heart chooses you 💕
+                  {/* Star Rating */}
+                  <div className={styles.starRating}>
+                    {[1, 2, 3].map((star) => (
+                      <motion.div
+                        key={star}
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: 0.3 + star * 0.15, type: 'spring' }}
+                      >
+                        <Star 
+                          size={32} 
+                          fill={star <= getStarRating() ? '#ffd700' : 'transparent'}
+                          color={star <= getStarRating() ? '#ffd700' : 'rgba(255,255,255,0.3)'}
+                        />
+                      </motion.div>
+                    ))}
                   </div>
+                  
+                  <div className={styles.victoryMessage}>
+                    Our love is unforgettable, just like you! 💕
+                  </div>
+                  
+                  <div className={styles.victoryStats}>
+                    Completed in {moves} moves
+                  </div>
+                  
                   <motion.button
                     className={styles.playAgainButton}
                     onClick={resetGame}
@@ -346,7 +344,7 @@ const Scene3Maze: React.FC = () => {
           </AnimatePresence>
         </motion.div>
 
-        {/* Control Hint */}
+        {/* Instructions */}
         {isPlaying && !hasWon && (
           <motion.div
             className={styles.controlHint}
@@ -354,7 +352,7 @@ const Scene3Maze: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            Move your cursor or finger to catch hearts
+            Tap cards to flip and find matching pairs!
           </motion.div>
         )}
       </div>

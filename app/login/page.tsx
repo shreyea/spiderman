@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Sparkles, Lock, Mail, ArrowRight } from "lucide-react";
+import { Heart, Sparkles, Key, Mail, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import styles from "./login.module.css";
 
+const TEMPLATE_TYPE = 'spiderman';
+
 export default function LoginPage() {
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [templateCode, setTemplateCode] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -16,18 +18,38 @@ export default function LoginPage() {
         setIsLoading(true);
         setError("");
 
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        // Query project with email + template_code + template_type
+        const { data: projectData, error: projectError } = await supabase
+            .from('projects')
+            .select('*')
+            .eq('owner_email', email)
+            .eq('template_code', templateCode)
+            .eq('template_type', TEMPLATE_TYPE)
+            .single();
 
-        if (error) {
-            setError(error.message);
+        if (projectError) {
+            if (projectError.code === 'PGRST116') {
+                setError('Invalid email or template code');
+            } else {
+                setError('Login failed: ' + projectError.message);
+            }
             setIsLoading(false);
-        } else {
-            // Redirect to home page where edit mode will be enabled
-            window.location.href = "/";
+            return;
         }
+
+        if (!projectData) {
+            setError('Invalid email or template code');
+            setIsLoading(false);
+            return;
+        }
+
+        // Store session info in localStorage for persistence
+        localStorage.setItem('auth_email', email);
+        localStorage.setItem('auth_template_code', templateCode);
+        localStorage.setItem('auth_project_id', projectData.id);
+
+        // Redirect to home page where edit mode will be enabled
+        window.location.href = "/";
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -147,7 +169,7 @@ export default function LoginPage() {
                         </div>
                         <input
                             type="email"
-                            placeholder="Your secret identity (email)"
+                            placeholder="Your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             onKeyPress={handleKeyPress}
@@ -162,13 +184,13 @@ export default function LoginPage() {
                         transition={{ delay: 0.5 }}
                     >
                         <div className={styles.inputIcon}>
-                            <Lock size={18} />
+                            <Key size={18} />
                         </div>
                         <input
-                            type="password"
-                            placeholder="Your secret code"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            type="text"
+                            placeholder="Template Code"
+                            value={templateCode}
+                            onChange={(e) => setTemplateCode(e.target.value)}
                             onKeyPress={handleKeyPress}
                             className={styles.input}
                         />

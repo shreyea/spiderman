@@ -26,12 +26,12 @@ const Scene7FinalPanel: React.FC = () => {
 
     // Floating stickers for decoration
     const decorativeStickers = [
-        { src: '/stickers/heart.png', top: '5%', left: '5%', size: 80, delay: 0.2, rotate: -15 },
+        { src: '/stickers/web2.png', top: '5%', left: '5%', size: 80, delay: 0.2, rotate: -15 },
         { src: '/stickers/web1.png', top: '10%', right: '8%', size: 90, delay: 0.4, rotate: 10 },
-        { src: '/stickers/spi.png', bottom: '15%', left: '3%', size: 75, delay: 0.6, rotate: -8 },
+        { src: '/stickers/spi.png', bottom: '15%', left: '3%', size: 105, delay: 0.6, rotate: -8 },
         { src: '/stickers/aesthetic_heart_sticker___Pink_Web_Heart_Sticker-removebg-preview.png', bottom: '10%', right: '5%', size: 70, delay: 0.8, rotate: 12 },
-        { src: '/stickers/web2.png', top: '40%', left: '2%', size: 65, delay: 1.0, rotate: -5 },
-        { src: '/stickers/spi2.png', top: '35%', right: '3%', size: 85, delay: 1.2, rotate: 8 },
+        { src: '/stickers/wh2.png', top: '40%', left: '5%', size: 95, delay: 1.0, rotate: -5 },
+        { src: '/stickers/spi2.png', top: '35%', right: '3%', size: 95, delay: 1.2, rotate: 8 },
     ];
 
     // Floating hearts for celebration
@@ -217,15 +217,7 @@ const Scene7FinalPanel: React.FC = () => {
                             />
                         </div>
                     </div>
-                    {isEditor && (
-                        <div className={styles.editControls}>
-                            <ImageUploadCard
-                                image={panels.panel1.image || ''}
-                                onImageChange={(url) => updatePanel('panel1', 'image', url)}
-                                label="Panel 1"
-                            />
-                        </div>
-                    )}
+
                 </motion.div>
 
                 {/* Panel 2 */}
@@ -253,15 +245,7 @@ const Scene7FinalPanel: React.FC = () => {
                             />
                         </div>
                     </div>
-                    {isEditor && (
-                        <div className={styles.editControls}>
-                            <ImageUploadCard
-                                image={panels.panel2.image || ''}
-                                onImageChange={(url) => updatePanel('panel2', 'image', url)}
-                                label="Panel 2"
-                            />
-                        </div>
-                    )}
+
                 </motion.div>
 
 
@@ -313,7 +297,7 @@ const Scene7FinalPanel: React.FC = () => {
                                 animate={{ opacity: [0.5, 1, 0.5] }}
                                 transition={{ duration: 2, repeat: Infinity }}
                             >
-                                💕 Tap to answer 💕
+                                💕 Tap  �
                             </motion.p>
                         )}
 
@@ -324,7 +308,11 @@ const Scene7FinalPanel: React.FC = () => {
                                 animate={{ scale: 1, opacity: 1 }}
                                 transition={{ type: 'spring', stiffness: 200 }}
                             >
-                                YES! FOREVER! 💕
+                                <InlineEditor
+                                    text={content.celebrationMessage || 'FOREVER💕'}
+                                    isEditor={isEditor}
+                                    onSave={(v) => updateContent({ celebrationMessage: v })}
+                                />
                             </motion.div>
                         )}
                     </div>
@@ -364,7 +352,7 @@ const Scene7FinalPanel: React.FC = () => {
                 animate={inView ? { scale: 1, rotate: -5 } : {}}
                 transition={{ delay: 2.6, type: 'spring' }}
             >
-                XOXO
+                WE
             </motion.div>
             <motion.div
                 className={`${styles.comicSticker} ${styles.stickerWow}`}
@@ -374,6 +362,7 @@ const Scene7FinalPanel: React.FC = () => {
             >
                 YOURS
             </motion.div>
+            
         </section>
     );
 };

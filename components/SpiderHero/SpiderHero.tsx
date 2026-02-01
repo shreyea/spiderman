@@ -403,7 +403,7 @@ const SpiderHero: React.FC = () => {
 
         {/* Comic Stickers */}
         <ComicSticker
-          text="POW!"
+          text="LOVE"
           color="#e63946"
           rotation={-15}
           delay={0.5}
@@ -411,7 +411,7 @@ const SpiderHero: React.FC = () => {
           top="65%"
         />
         <ComicSticker
-          text="LOVE"
+          text="FOREVER"
           color="#ffd700"
           rotation={10}
           delay={0.8}

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabaseClient";
+import ViewerClient from "./ViewerClient";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -21,13 +22,28 @@ export default async function ViewPage({ params }: PageProps) {
         console.log("PUBLIC VIEW ERROR:", error);
     }
 
-    if (!data) return <h1>Not published yet or not found</h1>;
+    if (!data) {
+        return (
+            <div style={{
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+                color: 'white',
+                fontFamily: 'system-ui, sans-serif'
+            }}>
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                    <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>❤️</h1>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Not Found</h2>
+                    <p style={{ opacity: 0.7 }}>This story hasn&apos;t been published yet or doesn&apos;t exist.</p>
+                </div>
+            </div>
+        );
+    }
 
-    console.log("PUBLIC VIEW: Project loaded:", data.id);
+    console.log("PUBLIC VIEW: Project loaded:", data.id, "Slug:", data.slug);
+    console.log("PUBLIC VIEW: Project data keys:", Object.keys(data.data || {}));
 
-    return (
-        <div>
-            <h1>{data.data?.heroText || "Welcome"}</h1>
-        </div>
-    );
+    return <ViewerClient projectData={data.data || {}} />;
 }

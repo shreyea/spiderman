@@ -25,8 +25,8 @@ const Scene4Collage: React.FC = () => {
     { id: 1, src: '/images/s1.png', caption: 'Our First Day', rotation: -5 },
     { id: 2, src: '/images/s2.png', caption: 'Best Moment', rotation: 3, useTapeAlt: true },
     { id: 3, src: '/images/s3.png', caption: 'Together Forever', rotation: -2 },
-    { id: 4, src: '/images/web1.png', caption: 'Connected', rotation: 4, useTapeAlt: true },
-    { id: 5, src: '/images/web2.png', caption: 'Intertwined', rotation: -4 },
+    { id: 4, src: '/stickers/web1.png', caption: 'Connected', rotation: 4, useTapeAlt: true },
+    { id: 5, src: '/stickers/web2.png', caption: 'Intertwined', rotation: -4 },
     { id: 6, src: '/images/bg.png', caption: 'Our World', rotation: 2, useTapeAlt: true },
   ];
 
@@ -301,7 +301,7 @@ const Scene4Collage: React.FC = () => {
         custom={-10}
         whileHover={{ scale: 1.1, rotate: '-11deg' }}
       >
-        <span>STICKY</span>
+        <span>FOREVER</span>
       </motion.div>
 
       <motion.div

@@ -20,6 +20,9 @@ export interface ContentData {
         images: string[];
         captions?: string[];
     };
+    letterText?: string;
+    letterTitle?: string;
+    celebrationMessage?: string;
     finalPanel?: {
         panel1: { text: string; image?: string };
         panel2: { text: string; image?: string };
@@ -52,6 +55,20 @@ const defaultContent: ContentData = {
         images: ['/images/s1.png', '/images/s2.png', '/images/s3.png', '/images/web1.png', '/images/web2.png', '/images/bg.png'],
         captions: ['The day we met', 'Our first adventure', 'Forever tangled', 'Connected by fate', 'Two hearts, one web', 'Our universe']
     },
+    letterText: `Dear Love,
+
+Even heroes fall in love...
+and somehow, you became my favorite story.
+
+Every moment with you feels like
+a page from a comic I never want to end.
+
+You are my greatest adventure,
+my sweetest chapter,
+and my happiest ending.
+
+Forever yours,
+Your Spider ❤️`,
     finalPanel: {
         panel1: { text: 'Every day, I find myself thinking about you...', image: '/images/s1.png' },
         panel2: { text: 'You make even the ordinary feel extraordinary.', image: '/images/s2.png' },

@@ -10,7 +10,7 @@ interface Project {
     id: string;
     owner_email: string;
     template_type: string;
-    template_password: string;
+    template_code: string;
     slug: string;
     data: any;
     is_published: boolean;
@@ -23,13 +23,10 @@ interface AuthContextType {
     isEditor: boolean;
     isLoading: boolean;
     loginError: string | null;
-    templateError: string | null;
     showLoginModal: boolean;
-    showTemplateModal: boolean;
     setShowLoginModal: (show: boolean) => void;
-    login: (email: string, password: string, templatePassword?: string) => Promise<boolean>;
+    login: (email: string, templateCode: string) => Promise<boolean>;
     logout: () => Promise<void>;
-    verifyTemplatePassword: (password: string) => Promise<boolean>;
     saveProject: (data: any) => Promise<boolean>;
     publishProject: () => Promise<boolean>;
     getShareLink: () => string;
@@ -42,139 +39,105 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [project, setProject] = useState<Project | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loginError, setLoginError] = useState<string | null>(null);
-    const [templateError, setTemplateError] = useState<string | null>(null);
     const [showLoginModal, setShowLoginModal] = useState(false);
-    const [showTemplateModal, setShowTemplateModal] = useState(false);
 
-    // Check session on mount
+    // Check for existing session on mount (from localStorage)
     useEffect(() => {
         console.log('AUTH: Checking initial session...');
 
-        supabase.auth.getSession().then(({ data, error }) => {
-            if (error) {
-                console.log('AUTH: Session error:', error);
+        const checkStoredSession = async () => {
+            if (typeof window === 'undefined') {
+                setIsLoading(false);
+                return;
             }
-            console.log('AUTH: Initial session:', data.session ? 'Found' : 'None');
-            setSession(data.session);
-            // Don't auto-show template modal - let user click login to start auth flow
+
+            const storedEmail = localStorage.getItem('auth_email');
+            const storedTemplateCode = localStorage.getItem('auth_template_code');
+
+            if (storedEmail && storedTemplateCode) {
+                console.log('AUTH: Found stored credentials, verifying...');
+
+                const { data: projectData, error } = await supabase
+                    .from('projects')
+                    .select('*')
+                    .eq('owner_email', storedEmail)
+                    .eq('template_code', storedTemplateCode)
+                    .eq('template_type', TEMPLATE_TYPE)
+                    .single();
+
+                if (!error && projectData) {
+                    console.log('AUTH: Session restored from storage');
+                    setSession({ user: { email: storedEmail } } as Session);
+                    setProject(projectData);
+                } else {
+                    console.log('AUTH: Stored credentials invalid, clearing...');
+                    localStorage.removeItem('auth_email');
+                    localStorage.removeItem('auth_template_code');
+                    localStorage.removeItem('auth_project_id');
+                }
+            }
+
             setIsLoading(false);
-        });
-
-        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-            console.log('AUTH: State changed:', _event);
-            setSession(session);
-
-            if (!session) {
-                setProject(null);
-                setShowTemplateModal(false);
-            }
-            // Don't auto-show template modal on auth state change
-        });
-
-        return () => {
-            authListener.subscription.unsubscribe();
         };
+
+        checkStoredSession();
     }, []);
 
-    const login = useCallback(async (email: string, password: string, templatePassword?: string): Promise<boolean> => {
-        console.log('AUTH: Attempting login for:', email);
+    const login = useCallback(async (email: string, templateCode: string): Promise<boolean> => {
+        console.log('AUTH: Attempting login for:', email, 'with template code');
         setLoginError(null);
-        setTemplateError(null);
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        // Query project with email + template_code + template_type
+        const { data: projectData, error: projectError } = await supabase
+            .from('projects')
+            .select('*')
+            .eq('owner_email', email)
+            .eq('template_code', templateCode)
+            .eq('template_type', TEMPLATE_TYPE)
+            .single();
 
-        if (error) {
-            console.log('AUTH: Login error:', error.message);
-            setLoginError(error.message);
+        if (projectError) {
+            console.log('AUTH: Login error:', projectError.message);
+            if (projectError.code === 'PGRST116') {
+                setLoginError('Invalid email or template code');
+            } else {
+                setLoginError('Login failed: ' + projectError.message);
+            }
             return false;
         }
 
-        console.log('AUTH: Login successful');
-        setSession(data.session);
-
-        // If template password provided, verify it immediately
-        if (templatePassword && data.session?.user?.email) {
-            console.log('AUTH: Verifying template password...');
-
-            const { data: projectData, error: projectError } = await supabase
-                .from('projects')
-                .select('*')
-                .eq('owner_email', data.session.user.email)
-                .eq('template_type', TEMPLATE_TYPE)
-                .eq('template_password', templatePassword)
-                .maybeSingle();
-
-            if (projectError) {
-                console.log('AUTH: Template verification error:', projectError);
-                setLoginError('Failed to verify template: ' + projectError.message);
-                return false;
-            }
-
-            if (!projectData) {
-                console.log('AUTH: No project found with this template password');
-                setLoginError('Invalid template password or no project found');
-                return false;
-            }
-
-            console.log('AUTH: Template verified, project loaded:', projectData.id);
-            setProject(projectData);
-            setShowLoginModal(false);
-            setShowTemplateModal(false);
-            return true;
+        if (!projectData) {
+            console.log('AUTH: No project found');
+            setLoginError('Invalid email or template code');
+            return false;
         }
 
-        // No template password provided - show template modal
+        console.log('AUTH: Login successful, project loaded:', projectData.id);
+        // Store in localStorage for persistence
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('auth_email', email);
+            localStorage.setItem('auth_template_code', templateCode);
+            localStorage.setItem('auth_project_id', projectData.id);
+        }
+        // Create a simple session object for tracking
+        setSession({ user: { email } } as Session);
+        setProject(projectData);
         setShowLoginModal(false);
-        setShowTemplateModal(true);
         return true;
     }, []);
 
     const logout = useCallback(async () => {
         console.log('AUTH: Logging out...');
-        await supabase.auth.signOut();
+        // Clear localStorage
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('auth_email');
+            localStorage.removeItem('auth_template_code');
+            localStorage.removeItem('auth_project_id');
+        }
         setSession(null);
         setProject(null);
-        setShowTemplateModal(false);
         console.log('AUTH: Logged out');
     }, []);
-
-    const verifyTemplatePassword = useCallback(async (password: string): Promise<boolean> => {
-        if (!session?.user?.email) {
-            setTemplateError('No session found');
-            return false;
-        }
-
-        console.log('AUTH: Verifying template password for:', session.user.email);
-        setTemplateError(null);
-
-        const { data, error } = await supabase
-            .from('projects')
-            .select('*')
-            .eq('owner_email', session.user.email)
-            .eq('template_type', TEMPLATE_TYPE)
-            .eq('template_password', password)
-            .maybeSingle();
-
-        if (error) {
-            console.log('AUTH: Template verification error:', error);
-            setTemplateError('Failed to verify: ' + error.message);
-            return false;
-        }
-
-        if (!data) {
-            console.log('AUTH: No project found with this password');
-            setTemplateError('Invalid template password or no project found');
-            return false;
-        }
-
-        console.log('AUTH: Template verified, project loaded:', data.id);
-        setProject(data);
-        setShowTemplateModal(false);
-        return true;
-    }, [session]);
 
     const saveProject = useCallback(async (newData: any): Promise<boolean> => {
         if (!project) {
@@ -239,13 +202,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             isEditor,
             isLoading,
             loginError,
-            templateError,
             showLoginModal,
-            showTemplateModal,
             setShowLoginModal,
             login,
             logout,
-            verifyTemplatePassword,
             saveProject,
             publishProject,
             getShareLink,

@@ -20,7 +20,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.3;
+  opacity: 0.8;
 }
 
 /* Scrapbook Texture */
@@ -31,13 +31,13 @@
     repeating-linear-gradient(0deg,
       transparent,
       transparent 50px,
-      rgba(255, 255, 255, 0.02) 50px,
-      rgba(255, 255, 255, 0.02) 51px),
+      rgba(255, 255, 255, 0.14) 50px,
+      rgba(255, 255, 255, 0.14) 51px),
     repeating-linear-gradient(90deg,
       transparent,
       transparent 50px,
-      rgba(255, 255, 255, 0.02) 50px,
-      rgba(255, 255, 255, 0.02) 51px);
+      rgba(255, 255, 255, 0.14  ) 50px,
+      rgba(255, 255, 255, 0.14) 51px);
   z-index: 1;
 }
 

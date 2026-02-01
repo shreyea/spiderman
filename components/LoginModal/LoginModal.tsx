@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, Heart, ArrowRight, Sparkles, Key } from 'lucide-react';
+import { X, Mail, Heart, ArrowRight, Sparkles, Key } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './LoginModal.module.css';
 
@@ -10,105 +10,24 @@ const LoginModal: React.FC = () => {
     const {
         showLoginModal,
         setShowLoginModal,
-        showTemplateModal,
-        session,
         login,
         loginError,
-        templateError,
-        verifyTemplatePassword
     } = useAuth();
 
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [templatePassword, setTemplatePassword] = useState('');
+    const [templateCode, setTemplateCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Call login with all three parameters
-        await login(email, password, templatePassword);
-        setIsLoading(false);
-    };
-
-    const handleTemplateVerify = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsLoading(true);
-        console.log('MODAL: Verifying template password...');
-        await verifyTemplatePassword(templatePassword);
+        await login(email, templateCode);
         setIsLoading(false);
     };
 
     const handleClose = () => {
         setShowLoginModal(false);
     };
-
-    // Template Password Modal (for users who logged in via /login page)
-    if (showTemplateModal && session && !showLoginModal) {
-        return (
-            <AnimatePresence>
-                <motion.div
-                    className={styles.overlay}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                >
-                    <motion.div
-                        className={styles.modal}
-                        initial={{ scale: 0.8, opacity: 0, y: 50 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.8, opacity: 0, y: 50 }}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className={styles.header}>
-                            <motion.div
-                                className={styles.heartIcon}
-                                animate={{ scale: [1, 1.2, 1] }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            >
-                                <Key size={28} color="#e63946" />
-                            </motion.div>
-                            <h2 className={styles.title}>Enter Template Password</h2>
-                            <p className={styles.subtitle}>One more step to unlock your story</p>
-                        </div>
-
-                        {templateError && (
-                            <div className={styles.error}>{templateError}</div>
-                        )}
-
-                        <form onSubmit={handleTemplateVerify} className={styles.form}>
-                            <div className={styles.inputGroup}>
-                                <Key size={18} className={styles.inputIcon} />
-                                <input
-                                    type="password"
-                                    placeholder="Template Password"
-                                    value={templatePassword}
-                                    onChange={(e) => setTemplatePassword(e.target.value)}
-                                    className={styles.input}
-                                    required
-                                    autoFocus
-                                />
-                            </div>
-
-                            <button
-                                type="submit"
-                                className={styles.submitButton}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? (
-                                    <Sparkles size={18} className={styles.spinning} />
-                                ) : (
-                                    <>
-                                        Unlock <ArrowRight size={16} />
-                                    </>
-                                )}
-                            </button>
-                        </form>
-                    </motion.div>
-                </motion.div>
-            </AnimatePresence>
-        );
-    }
 
     // Login Modal
     if (showLoginModal) {
@@ -162,24 +81,12 @@ const LoginModal: React.FC = () => {
                             </div>
 
                             <div className={styles.inputGroup}>
-                                <Lock size={18} className={styles.inputIcon} />
-                                <input
-                                    type="password"
-                                    placeholder="Password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className={styles.input}
-                                    required
-                                />
-                            </div>
-
-                            <div className={styles.inputGroup}>
                                 <Key size={18} className={styles.inputIcon} />
                                 <input
-                                    type="password"
-                                    placeholder="Template Password"
-                                    value={templatePassword}
-                                    onChange={(e) => setTemplatePassword(e.target.value)}
+                                    type="text"
+                                    placeholder="Template Code"
+                                    value={templateCode}
+                                    onChange={(e) => setTemplateCode(e.target.value)}
                                     className={styles.input}
                                     required
                                 />
