@@ -25,7 +25,7 @@ interface AuthContextType {
     loginError: string | null;
     showLoginModal: boolean;
     setShowLoginModal: (show: boolean) => void;
-    login: (email: string, templateCode: string) => Promise<boolean>;
+    login: (email: string, password: string, templateCode: string) => Promise<boolean>;
     logout: () => Promise<void>;
     saveProject: (data: any) => Promise<boolean>;
     publishProject: () => Promise<boolean>;
@@ -41,86 +41,131 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [loginError, setLoginError] = useState<string | null>(null);
     const [showLoginModal, setShowLoginModal] = useState(false);
 
-    // Check for existing session on mount (from localStorage)
+    // Check for existing Supabase Auth session on mount
     useEffect(() => {
         console.log('AUTH: Checking initial session...');
 
-        const checkStoredSession = async () => {
-            if (typeof window === 'undefined') {
-                setIsLoading(false);
-                return;
+        // Get current session
+        supabase.auth.getSession().then(async ({ data: { session: authSession }, error }) => {
+            if (error) {
+                console.log('AUTH: Session error:', error);
             }
+            
+            console.log('AUTH: Initial session:', authSession ? 'Found' : 'None');
+            setSession(authSession);
 
-            const storedEmail = localStorage.getItem('auth_email');
-            const storedTemplateCode = localStorage.getItem('auth_template_code');
+            // If we have a session, try to restore project from localStorage
+            if (authSession?.user?.email) {
+                const storedTemplateCode = localStorage.getItem('auth_template_code');
+                if (storedTemplateCode) {
+                    console.log('AUTH: Found stored template code, fetching project...');
+                    
+                    const { data: projectData, error: projectError } = await supabase
+                        .from('projects')
+                        .select('*')
+                        .eq('owner_email', authSession.user.email)
+                        .eq('template_type', TEMPLATE_TYPE)
+                        .eq('template_code', storedTemplateCode)
+                        .single();
 
-            if (storedEmail && storedTemplateCode) {
-                console.log('AUTH: Found stored credentials, verifying...');
+                    console.log('Email:', authSession.user.email);
+                    console.log('Template type:', TEMPLATE_TYPE);
+                    console.log('Template code:', storedTemplateCode);
+                    console.log('Project:', projectData);
+                    console.log('Error:', projectError);
 
-                const { data: projectData, error } = await supabase
-                    .from('projects')
-                    .select('*')
-                    .eq('owner_email', storedEmail)
-                    .eq('template_code', storedTemplateCode)
-                    .eq('template_type', TEMPLATE_TYPE)
-                    .single();
-
-                if (!error && projectData) {
-                    console.log('AUTH: Session restored from storage');
-                    setSession({ user: { email: storedEmail } } as Session);
-                    setProject(projectData);
-                } else {
-                    console.log('AUTH: Stored credentials invalid, clearing...');
-                    localStorage.removeItem('auth_email');
-                    localStorage.removeItem('auth_template_code');
-                    localStorage.removeItem('auth_project_id');
+                    if (!projectError && projectData) {
+                        console.log('AUTH: Project restored:', projectData.id);
+                        setProject(projectData);
+                    } else {
+                        console.log('AUTH: Could not restore project, clearing stored code');
+                        localStorage.removeItem('auth_template_code');
+                    }
                 }
             }
 
             setIsLoading(false);
-        };
+        });
 
-        checkStoredSession();
+        // Listen for auth changes
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, authSession) => {
+            console.log('AUTH: State changed:', _event);
+            setSession(authSession);
+
+            if (!authSession) {
+                setProject(null);
+                localStorage.removeItem('auth_template_code');
+            }
+        });
+
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
     }, []);
 
-    const login = useCallback(async (email: string, templateCode: string): Promise<boolean> => {
-        console.log('AUTH: Attempting login for:', email, 'with template code');
+    const login = useCallback(async (email: string, password: string, templateCode: string): Promise<boolean> => {
+        console.log('AUTH: Attempting Supabase Auth login for:', email);
         setLoginError(null);
 
-        // Query project with email + template_code + template_type
+        // Step 1: Authenticate with Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (authError) {
+            console.log('AUTH: Supabase Auth error:', authError.message);
+            setLoginError(authError.message);
+            return false;
+        }
+
+        if (!authData.session) {
+            console.log('AUTH: No session returned');
+            setLoginError('Login failed - no session');
+            return false;
+        }
+
+        console.log('AUTH: Supabase Auth successful, fetching project...');
+        setSession(authData.session);
+
+        // Step 2: Query project with owner_email + template_type + template_code
         const { data: projectData, error: projectError } = await supabase
             .from('projects')
             .select('*')
-            .eq('owner_email', email)
-            .eq('template_code', templateCode)
+            .eq('owner_email', authData.session.user.email)
             .eq('template_type', TEMPLATE_TYPE)
+            .eq('template_code', templateCode)
             .single();
 
+        console.log('Email:', authData.session.user.email);
+        console.log('Template type:', TEMPLATE_TYPE);
+        console.log('Template code:', templateCode);
+        console.log('Project:', projectData);
+        console.log('Error:', projectError);
+
         if (projectError) {
-            console.log('AUTH: Login error:', projectError.message);
+            console.log('AUTH: Project fetch error:', projectError.message);
             if (projectError.code === 'PGRST116') {
-                setLoginError('Invalid email or template code');
+                setLoginError('No project found with this template code');
             } else {
-                setLoginError('Login failed: ' + projectError.message);
+                setLoginError('Failed to load project: ' + projectError.message);
             }
             return false;
         }
 
         if (!projectData) {
             console.log('AUTH: No project found');
-            setLoginError('Invalid email or template code');
+            setLoginError('No project found with this template code');
             return false;
         }
 
         console.log('AUTH: Login successful, project loaded:', projectData.id);
-        // Store in localStorage for persistence
+        
+        // Store template code for session restoration
         if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_email', email);
             localStorage.setItem('auth_template_code', templateCode);
-            localStorage.setItem('auth_project_id', projectData.id);
         }
-        // Create a simple session object for tracking
-        setSession({ user: { email } } as Session);
+        
         setProject(projectData);
         setShowLoginModal(false);
         return true;
@@ -128,12 +173,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const logout = useCallback(async () => {
         console.log('AUTH: Logging out...');
+        await supabase.auth.signOut();
+        
         // Clear localStorage
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('auth_email');
             localStorage.removeItem('auth_template_code');
-            localStorage.removeItem('auth_project_id');
         }
+        
         setSession(null);
         setProject(null);
         console.log('AUTH: Logged out');

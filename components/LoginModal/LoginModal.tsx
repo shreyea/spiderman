@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Heart, ArrowRight, Sparkles, Key } from 'lucide-react';
+import { X, Mail, Lock, Heart, ArrowRight, Sparkles, Key } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import styles from './LoginModal.module.css';
 
@@ -15,13 +15,14 @@ const LoginModal: React.FC = () => {
     } = useAuth();
 
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [templateCode, setTemplateCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        await login(email, templateCode);
+        await login(email, password, templateCode);
         setIsLoading(false);
     };
 
@@ -75,6 +76,18 @@ const LoginModal: React.FC = () => {
                                     placeholder="Email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    className={styles.input}
+                                    required
+                                />
+                            </div>
+
+                            <div className={styles.inputGroup}>
+                                <Lock size={18} className={styles.inputIcon} />
+                                <input
+                                    type="password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className={styles.input}
                                     required
                                 />

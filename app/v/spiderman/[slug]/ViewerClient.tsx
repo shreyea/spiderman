@@ -10,7 +10,10 @@ interface ViewerClientProps {
 }
 
 const ViewerClient: React.FC<ViewerClientProps> = ({ projectData }) => {
-    console.log('VIEWER: Rendering with project data:', JSON.stringify(projectData).slice(0, 200));
+    console.log('VIEWER CLIENT: Received projectData');
+    console.log('VIEWER CLIENT: Data type:', typeof projectData);
+    console.log('VIEWER CLIENT: Data keys:', projectData ? Object.keys(projectData) : 'null');
+    console.log('VIEWER CLIENT: Data preview:', JSON.stringify(projectData).slice(0, 300));
 
     return (
         <AuthProvider>

@@ -93,14 +93,26 @@ export const ContentProvider: React.FC<{ children: ReactNode; initialContent?: C
     initialContent,
     isEditor = false
 }) => {
-    const [content, setContent] = useState<ContentData>(defaultContent);
-    const [editDraft, setEditDraft] = useState<ContentData>(defaultContent);
+    // Initialize state directly from initialContent if provided (for public view)
+    const [content, setContent] = useState<ContentData>(() => {
+        if (initialContent && Object.keys(initialContent).length > 0) {
+            console.log('CONTENT: Initializing with server data');
+            return { ...defaultContent, ...initialContent } as ContentData;
+        }
+        return defaultContent;
+    });
+    const [editDraft, setEditDraft] = useState<ContentData>(() => {
+        if (initialContent && Object.keys(initialContent).length > 0) {
+            return { ...defaultContent, ...initialContent } as ContentData;
+        }
+        return defaultContent;
+    });
     const initialized = React.useRef(false);
 
     useEffect(() => {
-        // Always update if initialContent is provided (e.g. loaded from Supabase after auth)
-        if (initialContent) {
-            console.log('CONTENT: Loading from Supabase project data');
+        // If initialContent is provided (from Supabase), use it and skip localStorage
+        if (initialContent && Object.keys(initialContent).length > 0) {
+            console.log('CONTENT: Loading from Supabase project data:', Object.keys(initialContent));
             const merged = { ...defaultContent, ...initialContent } as ContentData;
             setContent(merged);
             setEditDraft(merged);
@@ -110,8 +122,8 @@ export const ContentProvider: React.FC<{ children: ReactNode; initialContent?: C
 
         if (initialized.current) return;
 
-        // Load from local storage only if no initialContent and not initialized
-        if (typeof window !== 'undefined') {
+        // Load from local storage only if no initialContent (editor mode without saved project)
+        if (typeof window !== 'undefined' && !initialContent) {
             const saved = localStorage.getItem('spiderman_content');
             if (saved) {
                 try {

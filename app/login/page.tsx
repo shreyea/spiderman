@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Sparkles, Key, Mail, ArrowRight } from "lucide-react";
+import { Heart, Sparkles, Key, Mail, Lock, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import styles from "./login.module.css";
 
@@ -10,6 +10,7 @@ const TEMPLATE_TYPE = 'spiderman';
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [templateCode, setTemplateCode] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
@@ -18,35 +19,57 @@ export default function LoginPage() {
         setIsLoading(true);
         setError("");
 
-        // Query project with email + template_code + template_type
+        // Step 1: Authenticate with Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+
+        if (authError) {
+            setError(authError.message);
+            setIsLoading(false);
+            return;
+        }
+
+        if (!authData.session) {
+            setError('Login failed - no session');
+            setIsLoading(false);
+            return;
+        }
+
+        // Step 2: Query project with owner_email + template_type + template_code
         const { data: projectData, error: projectError } = await supabase
             .from('projects')
             .select('*')
-            .eq('owner_email', email)
-            .eq('template_code', templateCode)
+            .eq('owner_email', authData.session.user.email)
             .eq('template_type', TEMPLATE_TYPE)
+            .eq('template_code', templateCode)
             .single();
+
+        console.log('Email:', authData.session.user.email);
+        console.log('Template type:', TEMPLATE_TYPE);
+        console.log('Template code:', templateCode);
+        console.log('Project:', projectData);
+        console.log('Error:', projectError);
 
         if (projectError) {
             if (projectError.code === 'PGRST116') {
-                setError('Invalid email or template code');
+                setError('No project found with this template code');
             } else {
-                setError('Login failed: ' + projectError.message);
+                setError('Failed to load project: ' + projectError.message);
             }
             setIsLoading(false);
             return;
         }
 
         if (!projectData) {
-            setError('Invalid email or template code');
+            setError('No project found with this template code');
             setIsLoading(false);
             return;
         }
 
-        // Store session info in localStorage for persistence
-        localStorage.setItem('auth_email', email);
+        // Store template code for session restoration
         localStorage.setItem('auth_template_code', templateCode);
-        localStorage.setItem('auth_project_id', projectData.id);
 
         // Redirect to home page where edit mode will be enabled
         window.location.href = "/";
@@ -172,6 +195,25 @@ export default function LoginPage() {
                             placeholder="Your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            className={styles.input}
+                        />
+                    </motion.div>
+
+                    <motion.div
+                        className={styles.inputGroup}
+                        initial={{ x: -30, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.45 }}
+                    >
+                        <div className={styles.inputIcon}>
+                            <Lock size={18} />
+                        </div>
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             onKeyPress={handleKeyPress}
                             className={styles.input}
                         />
